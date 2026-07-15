@@ -2,13 +2,12 @@ O banco de dados de login será único para todas as organizações.
 Após todas as validações do login terá acesso aos dados do banco de dados no backend
 Cada organização terá seu banco de dados individual.
 
-┌────────────────────────────┐
-│           LOGIN            │
-├────────────────────────────┤
-│ Organização                │
-│ Login                      │
-│ Senha                      │
-└─────────────┬──────────────┘
+Campos da tela de login:
+
+Organização
+Login
+Senha
+
               │
               ▼
 Gera o e-mail "fake" do Firebase
