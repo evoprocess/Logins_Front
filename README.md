@@ -1,525 +1,200 @@
 # Sistema de Logins — Frontend
 
-Configure `VITE_API_URL`, execute `npm install` e `npm run dev`. Para produção, use `npm run build` e publique `dist`.
-# Arquitetura de Autenticação Multiempresa (Multi-Tenant)
+Interface de login multiempresa construída com HTML, CSS, JavaScript e Vite.
 
-## Objetivo
+## Responsabilidade do frontend
 
-O sistema utiliza uma arquitetura **Multi-Tenant**, onde existe apenas **um banco de autenticação central**, responsável por validar usuários e organizações.
+O frontend:
 
-Após todas as validações, o backend identifica automaticamente a organização do usuário e conecta ao banco de dados correspondente.
+1. Solicita organização, login e senha.
+2. Normaliza a organização em maiúsculas.
+3. Envia os dados exclusivamente ao backend por HTTPS.
+4. Exibe os erros devolvidos pela API.
+5. Armazena o JWT em `sessionStorage` após o sucesso.
+6. Exibe “Login realizado com sucesso”.
+7. Remove o JWT quando o usuário clica em **Sair**.
 
----
+O frontend não recebe as configurações `DADOS_FIREBASE_*`, não consulta diretamente o Firestore e não monta o e-mail interno. Essas responsabilidades pertencem ao backend.
 
-# Arquitetura Geral
-
-```text
-                           Usuário
-
-                               │
-                               ▼
-
-                    Organização | Login | Senha
-
-                               │
-                               ▼
-
-                  Firebase Central (Auth)
-
-                               │
-                               ▼
-
-             Firestore Central (logins_geral)
-
-                               │
-                               ▼
-
-               Todas as validações aprovadas
-
-                               │
-                               ▼
-
-                 Backend (Render / Node.js)
-
-                               │
-                               ▼
-
-          Identifica a organização (Tenant)
-
-                               │
-                               ▼
-
-      Carrega as credenciais da organização
-
-                               │
-                               ▼
-
-       Conecta ao banco da organização
-
-                               │
-                               ▼
-
-                  Sistema liberado
-```
-
----
-
-# Configuração do Render
-
-## Serviço
-
-| Configuração | Valor |
-|--------------|--------|
-| **Region** | Virginia (US East) |
-| **Branch** | `main` |
-| **Build Command** | `npm install` |
-| **Start Command** | `npm start` |
-
----
-
-# Variáveis de Ambiente
-
-## Firebase Central
+## Fluxo completo
 
 ```text
-DADOS_FIREBASE_LOGINS_GERAL
+Frontend
+   │ organização + login + senha
+   ▼
+Backend no Render
+   │ monta org_XXXX-login@sislogin.com.br
+   ▼
+Firebase Auth central
+   ▼
+Firestore central: logins_geral/ORG_XXXX
+   │ valida organização e login ativos
+   ▼
+Firebase Auth da organização
+   ▼
+JWT de sessão
+   ▼
+Frontend: login realizado com sucesso
 ```
 
-Responsável por:
+O mesmo e-mail interno e a mesma senha devem existir no Auth central e no Auth da organização correspondente.
 
-- Firebase Authentication
-- Firestore Central
-- Autenticação
-- Autorização
+## Requisitos
 
----
+- Node.js 20 ou superior;
+- backend em execução;
+- URL pública do backend.
 
-## Organizações
+## Variável de ambiente
 
-Cada organização possui sua própria variável.
+Crie um arquivo `.env` baseado em `.env.example`:
 
-Exemplo:
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+Para produção:
+
+```env
+VITE_API_URL=https://logins-back.onrender.com
+```
+
+Não coloque barra no final. Somente variáveis prefixadas com `VITE_` ficam disponíveis no código do navegador. Nunca coloque `SESSION_SECRET` ou `DADOS_FIREBASE_*` neste projeto.
+
+## Execução local
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Inicie o Vite:
+
+```bash
+npm run dev
+```
+
+Por padrão, a aplicação estará disponível em:
 
 ```text
-DADOS_FIREBASE_ORG_0001
-DADOS_FIREBASE_ORG_0002
-DADOS_FIREBASE_ORG_0003
-...
+http://localhost:5173
 ```
 
-Exemplo:
+No backend, inclua essa origem em `FRONTEND_URL`:
+
+```env
+FRONTEND_URL=http://localhost:5173
+```
+
+## Contrato com o backend
+
+O formulário envia:
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+```
 
 ```json
 {
-  "org": "ORG_0001",
-  "nome_org": "Empresa ABC",
-
-  "IMGBB_API_KEY": "XXXXXXXXXXXXXXXX",
-
-  "CLOUDINARY_URL_API_KEY": "cloudinary://XXXX:YYYY@ZZZZ",
-
-  "apiKey": "xxxxxxxx",
-  "authDomain": "xxxxxxxx",
-  "projectId": "xxxxxxxx",
-  "storageBucket": "xxxxxxxx",
-  "messagingSenderId": "xxxxxxxx",
-  "appId": "xxxxxxxx"
+  "organization": "ORG_0001",
+  "login": "dev.admin",
+  "password": "senha-do-usuario"
 }
 ```
 
----
+Em caso de sucesso, o backend devolve:
 
-# Tela de Login
-
-O usuário informa apenas:
-
-- Organização
-- Login
-- Senha
-
-Exemplo:
-
-| Campo | Valor |
-|--------|-------|
-| Organização | ORG_0001 |
-| Login | bia.santos |
-| Senha | ******** |
-
----
-
-# Geração do E-mail do Firebase
-
-Como o Firebase Authentication exige um e-mail, o sistema gera automaticamente um e-mail interno.
-
-Exemplo:
-
-```text
-ORG_0001-bia.santos@sistema.com.br
+```json
+{
+  "token": "jwt-da-sessao",
+  "expiresIn": 28800,
+  "message": "Login realizado com sucesso.",
+  "organization": {
+    "id": "ORG_0001",
+    "name": "Empresa 0001"
+  },
+  "user": {
+    "login": "dev.admin"
+  }
+}
 ```
 
-Esse e-mail existe apenas para autenticação e nunca é exibido ao usuário.
-
----
-
-# Fluxo Completo de Login
+O token é salvo com a chave:
 
 ```text
-Usuário
-
-↓
-
-Organização
-Login
-Senha
-
-↓
-
-Sistema gera
-
-ORG_0001-bia.santos@sistema.com.br
-
-↓
-
-Firebase Authentication
-
-↓
-
-Autenticou?
-
-├── Não
-│
-│   ↓
-│
-│ Erro de login
-│
-└── Sim
-
-↓
-
-Firestore Central
-
-↓
-
-Coleção:
-
-logins_geral
-
-↓
-
-Documento
-
-ORG_0001
-
-↓
-
-status_ativo_org == true ?
-
-↓
-
-Existe login?
-
-↓
-
-status_ativo_login == true ?
-
-↓
-
-Todas as validações aprovadas
-
-↓
-
-Backend (Render)
-
-↓
-
-Obtém as credenciais da organização
-
-↓
-
-Conecta ao banco da organização
-
-↓
-
-Cria a sessão
-
-↓
-
-Sistema liberado
+login_session
 ```
 
----
+Como o armazenamento é `sessionStorage`, o token é eliminado quando a sessão da aba é encerrada. Rotas protegidas futuras deverão enviá-lo ao backend no cabeçalho:
 
-# Estrutura do Firestore Central
+```http
+Authorization: Bearer <token>
+```
 
-A variável do Render
+## Build de produção
+
+```bash
+npm run build
+```
+
+Os arquivos finais são gerados em `dist`.
+
+Para testar o build localmente:
+
+```bash
+npm run preview
+```
+
+## GitHub Pages
+
+O projeto está configurado para publicação em:
 
 ```text
-DADOS_FIREBASE_LOGINS_GERAL
+https://evoprocess.github.io/Logins_Front/
 ```
 
-utiliza o seguinte Firestore:
+O `vite.config.js` usa:
+
+```js
+base: '/Logins_Front/'
+```
+
+O workflow `.github/workflows/pages.yml` executa automaticamente:
+
+1. `npm ci`;
+2. `npm run build`;
+3. publicação do diretório `dist`.
+
+No GitHub, configure **Settings → Pages → Source** como **GitHub Actions**.
+
+No Render, a origem permitida deve ser:
+
+```env
+FRONTEND_URL=https://evoprocess.github.io
+```
+
+Não use `/Logins_Front/` nessa variável.
+
+## Estrutura
 
 ```text
-logins_geral (coleção)
-
-└── ORG_0001 (documento)
-
-      status_ativo_org: true
-
-      logins_org (map)
-
-          bia.santos (map)
-
-              status_ativo_login: true
-
-          grazielle.carvalho (map)
-
-              status_ativo_login: true
-
-└── ORG_0002
-
-      status_ativo_org: true
-
-      logins_org (map)
-
-          joao.silva (map)
-
-              status_ativo_login: true
-
-          maria.souza (map)
-
-              status_ativo_login: false
+.
+├── .github/workflows/pages.yml
+├── src
+│   ├── main.js
+│   └── style.css
+├── .env.example
+├── index.html
+├── package.json
+└── vite.config.js
 ```
 
----
-
-# Significado da Estrutura
-
-| Campo | Tipo | Descrição |
-|--------|------|-----------|
-| `logins_geral` | Coleção | Banco central de autenticação |
-| `ORG_0001` | Documento | Organização (Tenant) |
-| `status_ativo_org` | Boolean | Organização habilitada |
-| `logins_org` | Map | Logins pertencentes à organização |
-| `bia.santos` | Map | Representa um login |
-| `status_ativo_login` | Boolean | Define se o login está ativo |
-
----
-
-# Processo de Validação
-
-O backend executa a seguinte sequência:
-
-1. Autentica no Firebase Authentication.
-2. Consulta a coleção `logins_geral`.
-3. Localiza a organização.
-4. Verifica `status_ativo_org`.
-5. Procura o login informado.
-6. Verifica `status_ativo_login`.
-7. Identifica a organização.
-8. Carrega as credenciais da organização.
-9. Conecta ao banco de dados correspondente.
-10. Cria a sessão do usuário.
-
----
-
-# Mapeamento das Organizações
-
-O Render possui o mapeamento das organizações.
-
-Exemplo:
-
-```text
-ORG_0001
-
-↓
-
-Projeto Firebase
-
-empresa_1
-
-↓
-
-Banco
-
-Firestore Empresa 1
-
-↓
-
-Sistema Liberado
-```
-
-Outro exemplo:
-
-```text
-ORG_0002
-
-↓
-
-Projeto Firebase
-
-empresa_2
-
-↓
-
-Banco
-
-Firestore Empresa 2
-
-↓
-
-Sistema Liberado
-```
-
----
-
-# Banco de Dados da Organização
-
-Após a autenticação, o usuário deixa de utilizar o Firebase Central.
-
-Toda a aplicação passa a utilizar apenas o banco da empresa.
-
-Exemplo:
-
-```text
-Firestore Empresa 1
-
-logins_org
-
-    bia.santos
-
-        nome
-        cargo
-        perfil
-        telefone
-        email
-        foto
-
-clientes
-
-produtos
-
-pedidos
-
-financeiro
-
-relatórios
-
-configurações
-
-...
-```
-
----
-
-# Separação de Responsabilidades
-
-## Firebase Central
-
-Responsável apenas por:
-
-- Authentication
-- Login
-- Senha
-- Organização
-- Autorização
-- Status da organização
-- Status do login
-
-Não armazena dados operacionais.
-
----
-
-## Backend (Render)
-
-Responsável por:
-
-- Validar autenticação.
-- Validar organização.
-- Carregar as variáveis de ambiente.
-- Obter as credenciais da organização.
-- Criar a sessão.
-- Conectar ao banco correto.
-
----
-
-## Banco da Organização
-
-Responsável por armazenar:
-
-- Usuários
-- Clientes
-- Produtos
-- Financeiro
-- Relatórios
-- Configurações
-- Documentos
-- Permissões
-- Dados operacionais
-
----
-
-# Fluxo Resumido
-
-```text
-                LOGIN
-
-Usuário
-
-↓
-
-Organização
-Login
-Senha
-
-↓
-
-Firebase Authentication
-
-↓
-
-Firestore Central
-
-↓
-
-Validação da Organização
-
-↓
-
-Validação do Login
-
-↓
-
-Backend (Render)
-
-↓
-
-DADOS_FIREBASE_ORG_0001
-
-↓
-
-Firebase / Banco da Empresa
-
-↓
-
-Sessão Criada
-
-↓
-
-Sistema Liberado
-```
-
----
-
-# Benefícios da Arquitetura
-
-- ✅ Um único projeto Firebase para autenticação.
-- ✅ Um único banco central de logins.
-- ✅ Isolamento completo entre organizações.
-- ✅ Cada empresa possui seu próprio banco de dados.
-- ✅ Escalabilidade para milhares de organizações.
-- ✅ Credenciais protegidas no backend.
-- ✅ Nenhuma credencial sensível é enviada ao frontend.
-- ✅ Arquitetura Multi-Tenant.
-- ✅ Fácil expansão para novas organizações.
-- ✅ Alta segurança com separação entre autenticação e dados operacionais.
+## Segurança
+
+- A senha é enviada somente ao backend usando HTTPS.
+- Nenhuma configuração Firebase fica no frontend.
+- O JWT não deve ser colocado em URLs ou logs.
+- O botão **Sair** remove o JWT da sessão do navegador.
+- A autenticação e as autorizações definitivas sempre são realizadas pelo backend e pelos projetos Firebase.
