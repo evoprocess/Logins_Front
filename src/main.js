@@ -27,7 +27,7 @@ form.addEventListener('submit', async event => {
     sessionStorage.setItem('login_session', data.token);
     const organization = String(data.organization.id || '').toUpperCase();
     if (/^ORG_[A-Z0-9]{4,20}$/.test(organization)) brandLogo.src = `./imagens/${organization}/logo.png`;
-    form.hidden = true; document.querySelector('.intro').hidden = true; success.hidden = false;
+    form.hidden = true; success.hidden = false;
     document.querySelector('#welcome').textContent = `${data.user.name} • ${data.user.role} • ${data.organization.name}`;
   } catch (error) { message.textContent = error.message; } finally { loading(false); }
 });
@@ -35,5 +35,5 @@ form.addEventListener('submit', async event => {
 document.querySelector('#logout').addEventListener('click', () => {
   sessionStorage.removeItem('login_session'); success.hidden = true; form.hidden = false;
   brandLogo.src = generalLogo;
-  document.querySelector('.intro').hidden = false; form.reset(); password.type = 'password';
+  form.reset(); password.type = 'password';
 });
