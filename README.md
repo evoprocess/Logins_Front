@@ -14,6 +14,26 @@ O frontend:
 6. Exibe “Login realizado com sucesso”.
 7. Remove o JWT quando o usuário clica em **Sair**.
 
+## Logomarcas
+
+A tela de login exibe a logomarca geral:
+
+```text
+imagens/logo.png
+```
+
+Depois do login, a interface troca automaticamente para a logomarca da organização retornada pelo backend:
+
+```text
+imagens/ORG_0001/logo.png
+imagens/ORG_0002/logo.png
+imagens/ORG_0003/logo.png
+```
+
+O nome da pasta deve ser exatamente o identificador da organização em maiúsculas. Se a imagem empresarial não existir ou não carregar, a interface mantém a logomarca geral. Ao sair, a logomarca geral é restaurada.
+
+O `vite.config.js` copia toda a árvore `imagens` para `dist/imagens` durante o build. Para cadastrar uma nova organização, basta criar `imagens/ORG_XXXX/logo.png`; não é necessário alterar o JavaScript.
+
 O frontend não recebe as configurações `DADOS_FIREBASE_*`, não consulta diretamente o Firestore e não monta o e-mail interno. Essas responsabilidades pertencem ao backend.
 
 ## Fluxo completo
