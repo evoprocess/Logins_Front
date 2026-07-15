@@ -3,10 +3,13 @@ Após todas as validações do login terá acesso aos dados do banco de dados no
 Cada organização terá seu banco de dados individual.
 
 Campos da tela de login:
-
+              ▼
 Organização
+              ▼
 Login
+              ▼
 Senha
+              ▼
 
               │
               ▼
