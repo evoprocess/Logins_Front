@@ -20,7 +20,7 @@ form.addEventListener('submit', async event => {
     if (!response.ok) throw new Error(data.error || 'Não foi possível entrar. Tente novamente.');
     sessionStorage.setItem('login_session', data.token);
     form.hidden = true; document.querySelector('.intro').hidden = true; success.hidden = false;
-    document.querySelector('#welcome').textContent = `${data.user.login} • ${data.organization.name}`;
+    document.querySelector('#welcome').textContent = `${data.user.name} • ${data.user.role} • ${data.organization.name}`;
   } catch (error) { message.textContent = error.message; } finally { loading(false); }
 });
 

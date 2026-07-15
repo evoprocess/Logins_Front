@@ -32,6 +32,9 @@ Firestore central: logins_geral/ORG_XXXX
    ▼
 Firebase Auth da organização
    ▼
+Firestore da organização: logins/{login}
+   │ carrega nome e cargo
+   ▼
 JWT de sessão
    ▼
 Frontend: login realizado com sucesso
@@ -116,9 +119,17 @@ Em caso de sucesso, o backend devolve:
     "name": "Empresa 0001"
   },
   "user": {
-    "login": "dev.admin"
+    "login": "dev.admin",
+    "name": "Caique Jorge Neymário",
+    "role": "admin"
   }
 }
+```
+
+Depois do sucesso, a interface exibe o nome, o cargo e o nome da organização. Exemplo:
+
+```text
+Caique Jorge Neymário • admin • Empresa 0001
 ```
 
 O token é salvo com a chave:
