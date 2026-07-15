@@ -149,6 +149,14 @@ npm run preview
 
 ## GitHub Pages
 
+O GitHub Pages e a opção **GitHub Actions** devem ser configurados somente neste repositório:
+
+```text
+Frontend: https://github.com/evoprocess/Logins_Front
+```
+
+Não configure GitHub Pages no `Logins_Back`. O backend é executado pelo Render e o repositório `Logins_Back` serve apenas como fonte para o deploy do serviço Node.js.
+
 O projeto está configurado para publicação em:
 
 ```text
@@ -167,7 +175,20 @@ O workflow `.github/workflows/pages.yml` executa automaticamente:
 2. `npm run build`;
 3. publicação do diretório `dist`.
 
-No GitHub, configure **Settings → Pages → Source** como **GitHub Actions**.
+No repositório `Logins_Front`, configure:
+
+1. Abra **Settings**.
+2. No menu lateral, abra **Pages**.
+3. Em **Build and deployment**, localize **Source**.
+4. Selecione **GitHub Actions**.
+5. Abra a aba **Actions** e acompanhe o workflow **Publicar no GitHub Pages**.
+
+Resumo da publicação:
+
+| Repositório | Onde é publicado | Configuração |
+| --- | --- | --- |
+| `Logins_Front` | GitHub Pages | **Settings → Pages → Source → GitHub Actions** |
+| `Logins_Back` | Render | Serviço conectado à branch `main`; sem GitHub Pages |
 
 No Render, a origem permitida deve ser:
 
