@@ -1,4 +1,4 @@
-const API_URL = (import.meta.env.VITE_API_URL || 'https://logins-back.onrender.com').replace(/\/$/, '');
+const API_URL = (import.meta.env?.VITE_API_URL || 'https://logins-back.onrender.com').replace(/\/$/, '');
 const form = document.querySelector('#login-form');
 const password = document.querySelector('#password');
 const showPassword = document.querySelector('#show-password');
