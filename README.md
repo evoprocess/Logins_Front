@@ -67,10 +67,10 @@ Após todas as validações, o backend identifica automaticamente a organizaçã
 
 | Configuração | Valor |
 |--------------|--------|
-| Region | Virginia (US East) |
-| Branch | `main` |
-| Build Command | `npm install` |
-| Start Command | `npm start` |
+| **Region** | Virginia (US East) |
+| **Branch** | `main` |
+| **Build Command** | `npm install` |
+| **Start Command** | `npm start` |
 
 ---
 
@@ -104,7 +104,7 @@ DADOS_FIREBASE_ORG_0003
 ...
 ```
 
-Exemplo de conteúdo:
+Exemplo:
 
 ```json
 {
@@ -146,9 +146,7 @@ Exemplo:
 
 # Geração do E-mail do Firebase
 
-O Firebase Authentication exige um endereço de e-mail.
-
-Como o usuário utiliza login em vez de e-mail, o sistema gera automaticamente um e-mail interno.
+Como o Firebase Authentication exige um e-mail, o sistema gera automaticamente um e-mail interno.
 
 Exemplo:
 
@@ -156,7 +154,7 @@ Exemplo:
 ORG_0001-bia.santos@sistema.com.br
 ```
 
-Esse e-mail existe apenas para autenticação no Firebase.
+Esse e-mail existe apenas para autenticação e nunca é exibido ao usuário.
 
 ---
 
@@ -167,15 +165,13 @@ Usuário
 
 ↓
 
-Informa:
-
-• Organização
-• Login
-• Senha
+Organização
+Login
+Senha
 
 ↓
 
-Sistema gera automaticamente
+Sistema gera
 
 ORG_0001-bia.santos@sistema.com.br
 
@@ -188,8 +184,10 @@ Firebase Authentication
 Autenticou?
 
 ├── Não
-│      ↓
-│   Erro de login
+│
+│   ↓
+│
+│ Erro de login
 │
 └── Sim
 
@@ -250,15 +248,13 @@ Sistema liberado
 
 # Estrutura do Firestore Central
 
-A variável
+A variável do Render
 
 ```text
 DADOS_FIREBASE_LOGINS_GERAL
 ```
 
-representa o projeto Firebase responsável apenas pela autenticação.
-
-Sua estrutura é:
+utiliza o seguinte Firestore:
 
 ```text
 logins_geral (coleção)
@@ -269,11 +265,11 @@ logins_geral (coleção)
 
       logins_org (map)
 
-          bia.santos
+          bia.santos (map)
 
               status_ativo_login: true
 
-          grazielle.carvalho
+          grazielle.carvalho (map)
 
               status_ativo_login: true
 
@@ -281,13 +277,13 @@ logins_geral (coleção)
 
       status_ativo_org: true
 
-      logins_org
+      logins_org (map)
 
-          joao.silva
+          joao.silva (map)
 
               status_ativo_login: true
 
-          maria.souza
+          maria.souza (map)
 
               status_ativo_login: false
 ```
@@ -298,35 +294,35 @@ logins_geral (coleção)
 
 | Campo | Tipo | Descrição |
 |--------|------|-----------|
-| logins_geral | Coleção | Coleção principal de autenticação |
-| ORG_0001 | Documento | Representa uma organização |
-| status_ativo_org | Boolean | Define se a organização pode utilizar o sistema |
-| logins_org | Map | Lista de logins da organização |
-| bia.santos | Map | Representa um login |
-| status_ativo_login | Boolean | Define se o login está ativo |
+| `logins_geral` | Coleção | Banco central de autenticação |
+| `ORG_0001` | Documento | Organização (Tenant) |
+| `status_ativo_org` | Boolean | Organização habilitada |
+| `logins_org` | Map | Logins pertencentes à organização |
+| `bia.santos` | Map | Representa um login |
+| `status_ativo_login` | Boolean | Define se o login está ativo |
 
 ---
 
 # Processo de Validação
 
-O backend realiza a seguinte sequência:
+O backend executa a seguinte sequência:
 
 1. Autentica no Firebase Authentication.
 2. Consulta a coleção `logins_geral`.
 3. Localiza a organização.
 4. Verifica `status_ativo_org`.
-5. Localiza o login.
+5. Procura o login informado.
 6. Verifica `status_ativo_login`.
 7. Identifica a organização.
-8. Obtém as credenciais da organização.
-9. Conecta ao banco da organização.
-10. Cria a sessão.
+8. Carrega as credenciais da organização.
+9. Conecta ao banco de dados correspondente.
+10. Cria a sessão do usuário.
 
 ---
 
 # Mapeamento das Organizações
 
-O Render identifica automaticamente a organização.
+O Render possui o mapeamento das organizações.
 
 Exemplo:
 
@@ -347,7 +343,7 @@ Firestore Empresa 1
 
 ↓
 
-Sistema liberado
+Sistema Liberado
 ```
 
 Outro exemplo:
@@ -369,16 +365,16 @@ Firestore Empresa 2
 
 ↓
 
-Sistema liberado
+Sistema Liberado
 ```
 
 ---
 
-# Banco da Organização
+# Banco de Dados da Organização
 
-Depois da autenticação, o usuário deixa de utilizar o Firebase Central.
+Após a autenticação, o usuário deixa de utilizar o Firebase Central.
 
-Toda a aplicação passa a utilizar exclusivamente o banco da organização.
+Toda a aplicação passa a utilizar apenas o banco da empresa.
 
 Exemplo:
 
@@ -411,8 +407,6 @@ configurações
 ...
 ```
 
-Esse banco contém **todos os dados operacionais** da empresa.
-
 ---
 
 # Separação de Responsabilidades
@@ -429,7 +423,7 @@ Responsável apenas por:
 - Status da organização
 - Status do login
 
-Não armazena dados da empresa.
+Não armazena dados operacionais.
 
 ---
 
@@ -437,9 +431,9 @@ Não armazena dados da empresa.
 
 Responsável por:
 
-- Validar o login.
-- Identificar a organização.
-- Ler as variáveis de ambiente.
+- Validar autenticação.
+- Validar organização.
+- Carregar as variáveis de ambiente.
 - Obter as credenciais da organização.
 - Criar a sessão.
 - Conectar ao banco correto.
@@ -454,18 +448,18 @@ Responsável por armazenar:
 - Clientes
 - Produtos
 - Financeiro
+- Relatórios
 - Configurações
 - Documentos
-- Relatórios
 - Permissões
-- Demais informações da empresa
+- Dados operacionais
 
 ---
 
 # Fluxo Resumido
 
 ```text
-               LOGIN
+                LOGIN
 
 Usuário
 
@@ -497,15 +491,15 @@ Backend (Render)
 
 ↓
 
-Obtém DADOS_FIREBASE_ORG_0001
+DADOS_FIREBASE_ORG_0001
 
 ↓
 
-Conecta ao Firebase/Banco da Empresa
+Firebase / Banco da Empresa
 
 ↓
 
-Cria Sessão
+Sessão Criada
 
 ↓
 
@@ -516,13 +510,13 @@ Sistema Liberado
 
 # Benefícios da Arquitetura
 
-- Um único projeto Firebase para autenticação.
-- Um único banco central de logins.
-- Isolamento total entre organizações.
-- Cada empresa possui seu próprio banco de dados.
-- Escalabilidade para milhares de organizações.
-- Credenciais protegidas no backend.
-- Nenhuma credencial sensível é enviada ao frontend.
-- Fácil manutenção e expansão da plataforma.
-- Arquitetura Multi-Tenant profissional.
-- Segurança elevada com separação entre autenticação e dados operacionais.
+- ✅ Um único projeto Firebase para autenticação.
+- ✅ Um único banco central de logins.
+- ✅ Isolamento completo entre organizações.
+- ✅ Cada empresa possui seu próprio banco de dados.
+- ✅ Escalabilidade para milhares de organizações.
+- ✅ Credenciais protegidas no backend.
+- ✅ Nenhuma credencial sensível é enviada ao frontend.
+- ✅ Arquitetura Multi-Tenant.
+- ✅ Fácil expansão para novas organizações.
+- ✅ Alta segurança com separação entre autenticação e dados operacionais.
