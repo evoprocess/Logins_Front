@@ -130,6 +130,35 @@
   to { transform: rotate(360deg); }
 }
 
+.menu-user {
+  margin: 2px 2px 8px;
+  padding: 12px;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.menu-user > strong {
+  display: block;
+  margin-bottom: 9px;
+  color: #17233c;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.menu-user span {
+  display: block;
+  margin-top: 5px;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.menu-user b {
+  color: #344054;
+  font-weight: 600;
+}
+
 @media (max-width: 520px) {
   .brand {
     height: 82px;
