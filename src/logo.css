@@ -17,7 +17,8 @@
 }
 
 .login-card input {
-  font-weight: 400;
+  color: #17233c;
+  font-weight: 600;
 }
 
 .login-card input::placeholder {
@@ -27,8 +28,8 @@
 }
 
 .login-card {
-  width: min(100%, 400px);
-  padding: 30px 34px 32px;
+  width: min(100%, 360px);
+  padding: 28px 30px 30px;
   border: 1px solid rgba(255, 255, 255, 0.85);
   border-radius: 18px;
   box-shadow: 0 18px 50px rgba(23, 35, 60, 0.12);
@@ -42,6 +43,33 @@
   margin-top: 14px;
   color: #344054;
   letter-spacing: 0.04em;
+}
+
+.password-field > label {
+  display: block;
+  margin: 14px 0 8px;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.password-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.password-row input:not([type="checkbox"]) {
+  min-width: 0;
+  margin-top: 0;
+}
+
+.password-row .check {
+  flex: 0 0 82px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.2;
 }
 
 .login-card input:not([type="checkbox"]) {
@@ -79,7 +107,11 @@
   }
 
   .login-card {
-    padding: 25px 22px 27px;
+    padding: 24px 20px 26px;
     border-radius: 16px;
+  }
+
+  .password-row {
+    gap: 8px;
   }
 }
