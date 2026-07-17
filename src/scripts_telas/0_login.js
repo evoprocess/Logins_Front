@@ -7,7 +7,9 @@ export function loginScreen(app) {
         <div class="brand"><img src="./imagens/logo.png" alt="Logo"></div>
         <form id="login-form">
           <label>ORGANIZAÇÃO
-            <input name="organization" placeholder="ORG_XXXX" required>
+            <select name="organization" required>
+              <option value="">Carregando organizações...</option>
+            </select>
           </label>
           <label>LOGIN
             <input name="login" placeholder="Digite seu login" required>
@@ -30,19 +32,28 @@ export function loginScreen(app) {
   let remembered = {};
   try { remembered = JSON.parse(localStorage.getItem('remembered_login') || '{}'); }
   catch { localStorage.removeItem('remembered_login'); }
-  form.organization.value = String(remembered.organization || '');
   form.login.value = String(remembered.login || '');
   const markRemembered = input => {
     const savedValue = String(remembered[input.name] || '');
     input.classList.toggle('is-remembered', Boolean(savedValue) && input.value === savedValue);
   };
-  markRemembered(form.organization);
   markRemembered(form.login);
-  form.organization.oninput = event => {
-    event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
-    markRemembered(event.target);
-  };
   form.login.oninput = event => markRemembered(event.target);
+  fetch(`${API_URL}/api/organizations`)
+    .then(response => response.ok ? response.json() : Promise.reject(new Error()))
+    .then(data => {
+      form.organization.innerHTML = '<option value="">Selecione uma organização</option>'
+        + (data.organizations || []).map(org => `<option value="${org.id}">${org.id} — ${org.name}</option>`).join('');
+      form.organization.value = String(remembered.organization || '');
+      form.organization.classList.toggle('is-remembered', Boolean(form.organization.value));
+    })
+    .catch(() => {
+      form.organization.innerHTML = '<option value="">Não foi possível carregar</option>';
+      app.querySelector('#error').textContent = 'Não foi possível carregar as organizações.';
+    });
+  form.organization.onchange = () => {
+    form.organization.classList.toggle('is-remembered', form.organization.value === remembered.organization);
+  };
   app.querySelector('#show').onchange = event => {
     form.password.type = event.target.checked ? 'text' : 'password';
   };
