@@ -27,6 +27,11 @@ export function loginScreen(app) {
     </div>`;
 
   const form = app.querySelector('#login-form');
+  let remembered = {};
+  try { remembered = JSON.parse(localStorage.getItem('remembered_login') || '{}'); }
+  catch { localStorage.removeItem('remembered_login'); }
+  form.organization.value = String(remembered.organization || '');
+  form.login.value = String(remembered.login || '');
   form.organization.oninput = event => {
     event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
   };
@@ -52,6 +57,10 @@ export function loginScreen(app) {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || 'Falha ao entrar.');
+      localStorage.setItem('remembered_login', JSON.stringify({
+        organization: form.organization.value,
+        login: form.login.value
+      }));
       state.token = data.token;
       state.session = data;
       sessionStorage.setItem('login_session', data.token);
