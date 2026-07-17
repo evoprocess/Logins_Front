@@ -16,6 +16,16 @@
   object-fit: contain;
 }
 
+.login-card input {
+  font-weight: 400;
+}
+
+.login-card input::placeholder {
+  color: #98a2b3;
+  font-weight: 400;
+  opacity: 1;
+}
+
 @media (max-width: 520px) {
   .brand {
     height: 170px;
