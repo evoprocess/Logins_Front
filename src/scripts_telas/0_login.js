@@ -19,8 +19,9 @@ export function loginScreen(app) {
               <label class="check" for="show"><input id="show" type="checkbox"> Exibir senha</label>
             </div>
           </div>
-          <p id="error" class="error"></p>
-          <button type="submit">ENTRAR</button>
+          <p id="error" class="error" role="alert"></p>
+          <p id="login-status" class="login-status" aria-live="polite"></p>
+          <button type="submit"><span class="button-text">ENTRAR</span><span class="login-spinner" aria-hidden="true"></span></button>
         </form>
       </section>
     </div>`;
@@ -35,7 +36,14 @@ export function loginScreen(app) {
   form.onsubmit = async event => {
     event.preventDefault();
     const button = form.querySelector('button');
+    const buttonText = button.querySelector('.button-text');
+    const status = app.querySelector('#login-status');
+    app.querySelector('#error').textContent = '';
     button.disabled = true;
+    button.classList.add('is-loading');
+    button.setAttribute('aria-busy', 'true');
+    buttonText.textContent = 'ENTRANDO';
+    status.textContent = 'Validando acesso...';
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
@@ -53,6 +61,10 @@ export function loginScreen(app) {
       app.querySelector('#error').textContent = error.message;
     } finally {
       button.disabled = false;
+      button.classList.remove('is-loading');
+      button.removeAttribute('aria-busy');
+      buttonText.textContent = 'ENTRAR';
+      status.textContent = '';
     }
   };
 }

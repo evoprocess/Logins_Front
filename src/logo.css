@@ -97,6 +97,39 @@
   box-shadow: 0 8px 18px rgba(41, 98, 255, 0.2);
 }
 
+.login-card button:disabled {
+  cursor: wait;
+  opacity: 0.82;
+}
+
+.login-status {
+  min-height: 18px;
+  margin: -6px 0 8px;
+  color: #667085;
+  font-size: 12px;
+  text-align: center;
+}
+
+.login-spinner {
+  display: none;
+  width: 15px;
+  height: 15px;
+  margin-left: 9px;
+  border: 2px solid rgba(255, 255, 255, 0.38);
+  border-top-color: #fff;
+  border-radius: 50%;
+  vertical-align: -3px;
+  animation: login-spin 0.7s linear infinite;
+}
+
+.login-card button.is-loading .login-spinner {
+  display: inline-block;
+}
+
+@keyframes login-spin {
+  to { transform: rotate(360deg); }
+}
+
 @media (max-width: 520px) {
   .brand {
     height: 82px;
