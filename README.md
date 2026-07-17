@@ -5,7 +5,7 @@ Este manual apresenta as funções disponíveis na interface do SisEVO.
 ## Entrar no sistema
 
 1. Abra a página do SisEVO.
-2. Selecione sua organização.
+2. Digite o código da sua organização, por exemplo `ORG_0001`.
 3. Digite seu login e sua senha.
 4. Clique em **Entrar**.
 
