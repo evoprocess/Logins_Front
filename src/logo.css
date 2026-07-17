@@ -85,6 +85,18 @@
   outline: none;
 }
 
+.login-card input.is-remembered:not([type="checkbox"]) {
+  border-color: #a9c3ff;
+  background: #eef4ff;
+  box-shadow: inset 3px 0 0 #2962ff;
+}
+
+.login-card input.is-remembered:not([type="checkbox"]):focus {
+  border-color: #2962ff;
+  background: #f4f7ff;
+  box-shadow: inset 3px 0 0 #2962ff, 0 0 0 3px rgba(41, 98, 255, 0.1);
+}
+
 .login-card .check {
   margin-top: 13px;
   color: #667085;

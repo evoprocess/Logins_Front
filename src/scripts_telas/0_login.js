@@ -32,9 +32,17 @@ export function loginScreen(app) {
   catch { localStorage.removeItem('remembered_login'); }
   form.organization.value = String(remembered.organization || '');
   form.login.value = String(remembered.login || '');
+  const markRemembered = input => {
+    const savedValue = String(remembered[input.name] || '');
+    input.classList.toggle('is-remembered', Boolean(savedValue) && input.value === savedValue);
+  };
+  markRemembered(form.organization);
+  markRemembered(form.login);
   form.organization.oninput = event => {
     event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+    markRemembered(event.target);
   };
+  form.login.oninput = event => markRemembered(event.target);
   app.querySelector('#show').onchange = event => {
     form.password.type = event.target.checked ? 'text' : 'password';
   };
