@@ -1,252 +1,89 @@
-# Sistema de Logins — Frontend
+# SisEVO — Manual de uso
 
-Interface de login multiempresa construída com HTML, CSS, JavaScript e Vite.
+Este manual apresenta as funções disponíveis na interface do SisEVO.
 
-## Responsabilidade do frontend
+## Entrar no sistema
 
-O frontend:
+1. Abra a página do SisEVO.
+2. Selecione sua organização.
+3. Digite seu login e sua senha.
+4. Clique em **Entrar**.
 
-1. Solicita organização, login e senha.
-2. Normaliza a organização em maiúsculas.
-3. Envia os dados exclusivamente ao backend por HTTPS.
-4. Exibe os erros devolvidos pela API.
-5. Armazena o JWT em `sessionStorage` após o sucesso.
-6. Exibe “Login realizado com sucesso”.
-7. Remove o JWT quando o usuário clica em **Sair**.
+Durante a validação, o botão exibirá **Entrando**. Aguarde até a abertura da Home ou a exibição de uma mensagem.
 
-## Logomarcas
+Após o primeiro acesso bem-sucedido, organização e login ficam preenchidos no próximo acesso. Esses campos aparecem com fundo azul-claro para indicar que foram lembrados. A senha não é salva.
 
-A tela de login exibe a logomarca geral:
+Use **Exibir senha** para conferir temporariamente o que foi digitado.
 
-```text
-imagens/logo.png
-```
+## Menu principal
 
-Depois do login, a interface troca automaticamente para a logomarca da organização retornada pelo backend:
+Depois do login, clique no botão com três traços no canto superior direito.
 
-```text
-imagens/ORG_0001/logo.png
-imagens/ORG_0002/logo.png
-imagens/ORG_0003/logo.png
-```
+O cabeçalho do menu apresenta:
 
-O nome da pasta deve ser exatamente o identificador da organização em maiúsculas. Se a imagem empresarial não existir ou não carregar, a interface mantém a logomarca geral. Ao sair, a logomarca geral é restaurada.
+- nome do usuário;
+- perfil;
+- cargo.
 
-O `vite.config.js` copia toda a árvore `imagens` para `dist/imagens` durante o build. Para cadastrar uma nova organização, basta criar `imagens/ORG_XXXX/logo.png`; não é necessário alterar o JavaScript.
+As opções exibidas dependem do perfil.
 
-O frontend não recebe as configurações `DADOS_FIREBASE_*`, não consulta diretamente o Firestore e não monta o e-mail interno. Essas responsabilidades pertencem ao backend.
+### Todos os perfis
 
-## Fluxo completo
+- **Home**
+- **Sair**
 
-```text
-Frontend
-   │ organização + login + senha
-   ▼
-Backend no Render
-   │ monta org_XXXX-login@sislogin.com.br
-   ▼
-Firebase Auth central
-   ▼
-Firestore central: logins_geral/ORG_XXXX
-   │ valida organização e login ativos
-   ▼
-Firebase Auth da organização
-   ▼
-Firestore da organização: logins/{login}
-   │ carrega nome e cargo
-   ▼
-JWT de sessão
-   ▼
-Frontend: login realizado com sucesso
-```
+### Admin e gerente
 
-O mesmo e-mail interno e a mesma senha devem existir no Auth central e no Auth da organização correspondente.
+- **Home**
+- **Sistema de Pagamento**
+- **Gestão de Acessos**
+- **Sair**
 
-## Requisitos
+## Home
 
-- Node.js 20 ou superior;
-- backend em execução;
-- URL pública do backend.
+A Home é a primeira tela aberta após o login. Ela identifica o usuário, seu perfil e a organização atual.
 
-## Variável de ambiente
+## Sistema de Pagamento
 
-Crie um arquivo `.env` baseado em `.env.example`:
+Esta tela permite consultar cobranças recentes e, quando autorizado, criar uma nova cobrança.
 
-```env
-VITE_API_URL=http://localhost:3000
-```
+Para criar uma cobrança:
 
-Para produção:
+1. Selecione a organização, quando o campo estiver disponível.
+2. Informe cliente, CPF ou CNPJ e, opcionalmente, e-mail.
+3. Informe valor, forma de pagamento e vencimento.
+4. Clique em **Criar cobrança**.
 
-```env
-VITE_API_URL=https://logins-back.onrender.com
-```
+Gerentes operam somente com a própria organização. Administradores podem selecionar uma organização disponível.
 
-Não coloque barra no final. Somente variáveis prefixadas com `VITE_` ficam disponíveis no código do navegador. Nunca coloque `SESSION_SECRET` ou `DADOS_FIREBASE_*` neste projeto.
+## Gestão de Acessos
 
-## Execução local
+Esta tela mostra organizações e seus logins.
 
-Instale as dependências:
+O gerente pode ativar ou inativar logins da própria organização.
 
-```bash
-npm install
-```
+O administrador pode gerenciar as organizações apresentadas e, conforme permitido pela tela:
 
-Inicie o Vite:
+- ativar ou inativar logins;
+- adicionar ou excluir logins;
+- alterar perfis permitidos;
+- ativar ou inativar organizações.
 
-```bash
-npm run dev
-```
+## Sair
 
-Por padrão, a aplicação estará disponível em:
+Abra o menu e clique em **Sair**. A sessão atual será encerrada e a tela de login será exibida novamente.
 
-```text
-http://localhost:5173
-```
+## Mensagens comuns
 
-No backend, inclua essa origem em `FRONTEND_URL`:
+- **Organização, login ou senha inválidos:** confira a organização selecionada e as credenciais.
+- **Login não autorizado ou desativado:** solicite a verificação do seu acesso.
+- **Organização desativada ou acesso vencido:** procure o responsável pela organização.
+- **Sessão inválida ou expirada:** entre novamente.
+- **Não foi possível carregar:** atualize a página e tente outra vez.
 
-```env
-FRONTEND_URL=http://localhost:5173
-```
+## Privacidade
 
-## Contrato com o backend
-
-O formulário envia:
-
-```http
-POST /api/auth/login
-Content-Type: application/json
-```
-
-```json
-{
-  "organization": "ORG_0001",
-  "login": "dev.admin",
-  "password": "senha-do-usuario"
-}
-```
-
-Em caso de sucesso, o backend devolve:
-
-```json
-{
-  "token": "jwt-da-sessao",
-  "expiresIn": 28800,
-  "message": "Login realizado com sucesso.",
-  "organization": {
-    "id": "ORG_0001",
-    "name": "Empresa 0001"
-  },
-  "user": {
-    "login": "dev.admin",
-    "name": "Caique Jorge Neymário",
-    "role": "admin"
-  }
-}
-```
-
-Depois do sucesso, a interface exibe o nome, o cargo e o nome da organização. Exemplo:
-
-```text
-Caique Jorge Neymário • admin • Empresa 0001
-```
-
-O token é salvo com a chave:
-
-```text
-login_session
-```
-
-Como o armazenamento é `sessionStorage`, o token é eliminado quando a sessão da aba é encerrada. Rotas protegidas futuras deverão enviá-lo ao backend no cabeçalho:
-
-```http
-Authorization: Bearer <token>
-```
-
-## Build de produção
-
-```bash
-npm run build
-```
-
-Os arquivos finais são gerados em `dist`.
-
-Para testar o build localmente:
-
-```bash
-npm run preview
-```
-
-## GitHub Pages
-
-O GitHub Pages e a opção **GitHub Actions** devem ser configurados somente neste repositório:
-
-```text
-Frontend: https://github.com/evoprocess/Logins_Front
-```
-
-Não configure GitHub Pages no `Logins_Back`. O backend é executado pelo Render e o repositório `Logins_Back` serve apenas como fonte para o deploy do serviço Node.js.
-
-O projeto está configurado para publicação em:
-
-```text
-https://evoprocess.github.io/Logins_Front/
-```
-
-O `vite.config.js` usa:
-
-```js
-base: '/Logins_Front/'
-```
-
-O workflow `.github/workflows/pages.yml` executa automaticamente:
-
-1. `npm ci`;
-2. `npm run build`;
-3. publicação do diretório `dist`.
-
-No repositório `Logins_Front`, configure:
-
-1. Abra **Settings**.
-2. No menu lateral, abra **Pages**.
-3. Em **Build and deployment**, localize **Source**.
-4. Selecione **GitHub Actions**.
-5. Abra a aba **Actions** e acompanhe o workflow **Publicar no GitHub Pages**.
-
-Resumo da publicação:
-
-| Repositório | Onde é publicado | Configuração |
-| --- | --- | --- |
-| `Logins_Front` | GitHub Pages | **Settings → Pages → Source → GitHub Actions** |
-| `Logins_Back` | Render | Serviço conectado à branch `main`; sem GitHub Pages |
-
-No Render, a origem permitida deve ser:
-
-```env
-FRONTEND_URL=https://evoprocess.github.io
-```
-
-Não use `/Logins_Front/` nessa variável.
-
-## Estrutura
-
-```text
-.
-├── .github/workflows/pages.yml
-├── src
-│   ├── main.js
-│   └── style.css
-├── .env.example
-├── index.html
-├── package.json
-└── vite.config.js
-```
-
-## Segurança
-
-- A senha é enviada somente ao backend usando HTTPS.
-- Nenhuma configuração Firebase fica no frontend.
-- O JWT não deve ser colocado em URLs ou logs.
-- O botão **Sair** remove o JWT da sessão do navegador.
-- A autenticação e as autorizações definitivas sempre são realizadas pelo backend e pelos projetos Firebase.
+- Nunca compartilhe sua senha.
+- Não deixe uma sessão aberta em computador compartilhado.
+- Use **Sair** ao terminar.
+- Organização e login podem ser lembrados pelo navegador; a senha não é armazenada pela interface.

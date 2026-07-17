@@ -42,8 +42,17 @@ export function loginScreen(app) {
   fetch(`${API_URL}/api/organizations`)
     .then(response => response.ok ? response.json() : Promise.reject(new Error()))
     .then(data => {
-      form.organization.innerHTML = '<option value="">Selecione uma organização</option>'
-        + (data.organizations || []).map(org => `<option value="${org.id}">${org.id} — ${org.name}</option>`).join('');
+      form.organization.replaceChildren();
+      const prompt = document.createElement('option');
+      prompt.value = '';
+      prompt.textContent = 'Selecione uma organização';
+      form.organization.append(prompt);
+      for (const org of data.organizations || []) {
+        const option = document.createElement('option');
+        option.value = String(org.id || '');
+        option.textContent = `${org.id} — ${org.name}`;
+        form.organization.append(option);
+      }
       form.organization.value = String(remembered.organization || '');
       form.organization.classList.toggle('is-remembered', Boolean(form.organization.value));
     })
