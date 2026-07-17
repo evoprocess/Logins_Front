@@ -1,39 +1,12 @@
-const API_URL = (import.meta.env?.VITE_API_URL || 'https://logins-back.onrender.com').replace(/\/$/, '');
-const form = document.querySelector('#login-form');
-const password = document.querySelector('#password');
-const showPassword = document.querySelector('#show-password');
-const message = document.querySelector('#message');
-const button = document.querySelector('#submit');
-const success = document.querySelector('#success');
-const brandLogo = document.querySelector('#brand-logo');
-const generalLogo = brandLogo.src;
-
-brandLogo.addEventListener('error', () => {
-  if (brandLogo.src !== generalLogo) brandLogo.src = generalLogo;
-});
-
-showPassword.addEventListener('change', () => { password.type = showPassword.checked ? 'text' : 'password'; });
-document.querySelector('#organization').addEventListener('input', event => { event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, ''); });
-function loading(active) { button.disabled = active; button.classList.toggle('loading', active); button.querySelector('span:first-child').textContent = active ? 'ENTRANDO' : 'ENTRAR'; }
-
-form.addEventListener('submit', async event => {
-  event.preventDefault(); message.textContent = '';
-  if (!form.reportValidity()) return;
-  loading(true);
-  try {
-    const response = await fetch(`${API_URL}/api/auth/login`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ organization: form.organization.value, login: form.login.value, password: form.password.value }) });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || 'Não foi possível entrar. Tente novamente.');
-    sessionStorage.setItem('login_session', data.token);
-    const organization = String(data.organization.id || '').toUpperCase();
-    if (/^ORG_[A-Z0-9]{4,20}$/.test(organization)) brandLogo.src = `./imagens/${organization}/logo.png`;
-    form.hidden = true; success.hidden = false;
-    document.querySelector('#welcome').textContent = `${data.user.name} • ${data.user.role} • ${data.organization.name}`;
-  } catch (error) { message.textContent = error.message; } finally { loading(false); }
-});
-
-document.querySelector('#logout').addEventListener('click', () => {
-  sessionStorage.removeItem('login_session'); success.hidden = true; form.hidden = false;
-  brandLogo.src = generalLogo;
-  form.reset(); password.type = 'password';
-});
+import { loginScreen } from './scripts_telas/0_login.js';
+import { homeScreen } from './scripts_telas/1_home.js';
+import { paymentsScreen } from './scripts_telas/2_sistema_de_pagamentos.js';
+import { accessScreen } from './scripts_telas/3_gestao_de_acessos.js';
+export const API_URL = (import.meta.env?.VITE_API_URL || 'https://logins-back.onrender.com').replace(/\/$/, '');
+export const state = { token: sessionStorage.getItem('login_session') || '', session: JSON.parse(sessionStorage.getItem('login_data') || 'null') };
+export async function api(path, options = {}) { const response = await fetch(`${API_URL}${path}`, { ...options, headers: { authorization: `Bearer ${state.token}`, ...(options.body ? { 'content-type': 'application/json' } : {}), ...options.headers } }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || 'Nao foi possivel concluir.'); return data; }
+export function logout() { sessionStorage.removeItem('login_session'); sessionStorage.removeItem('login_data'); state.token = ''; state.session = null; navigate('login'); }
+export function shell(content, title) { const role = state.session.user.role; const privileged = ['admin', 'gerente'].includes(role); return `<div class="app-shell"><header><div class="header-brand"><img src="./imagens/logo.png" alt="Logo"><div><strong>Sistema de Logins</strong><small>${state.session.organization.id} · ${role}</small></div></div><button id="menu-button" class="menu-button" aria-label="Abrir menu">☰</button><nav id="menu" hidden><button data-page="home">Home</button>${privileged ? '<button data-page="payments">Sistema de Pagamento</button><button data-page="access">Gestão de Acessos</button>' : ''}<button id="logout">Sair</button></nav></header><section class="content"><div class="title"><p>PAINEL</p><h1>${title}</h1></div>${content}</section></div>`; }
+export function bindShell() { const menu = document.querySelector('#menu'); document.querySelector('#menu-button').onclick = () => { menu.hidden = !menu.hidden; }; menu.querySelectorAll('[data-page]').forEach(x => x.onclick = () => navigate(x.dataset.page)); document.querySelector('#logout').onclick = logout; }
+export async function navigate(page) { const app = document.querySelector('#app'); if (!state.token || !state.session) page = 'login'; if (page === 'login') return loginScreen(app); if (page === 'payments' && !['admin', 'gerente'].includes(state.session.user.role)) page = 'home'; if (page === 'access' && !['admin', 'gerente'].includes(state.session.user.role)) page = 'home'; if (page === 'payments') return paymentsScreen(app); if (page === 'access') return accessScreen(app); return homeScreen(app); }
+navigate(state.token ? 'home' : 'login');
