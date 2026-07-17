@@ -131,31 +131,31 @@
 }
 
 .menu-user {
-  margin: 2px 2px 8px;
-  padding: 12px;
-  border-bottom: 1px solid #eaecf0;
+  margin: 0 0 8px;
+  padding: 15px 14px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #17233c, #234b91);
 }
 
 .menu-user > strong {
   display: block;
-  margin-bottom: 9px;
-  color: #17233c;
-  font-size: 12px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 0;
 }
 
 .menu-user span {
   display: block;
   margin-top: 5px;
-  color: #667085;
+  color: rgba(255, 255, 255, 0.78);
   font-size: 12px;
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
 .menu-user b {
-  color: #344054;
+  color: #fff;
   font-weight: 600;
 }
 
