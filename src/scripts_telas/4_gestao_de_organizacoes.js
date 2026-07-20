@@ -1,4 +1,4 @@
-import { api, state, shell, bindShell, SYSTEM_NAME } from '../main.js';
+import { api, state, shell, bindShell, SYSTEM_NAME, SYSTEM_EMAIL } from '../main.js';
 import '../organizations.css';
 
 const esc = value => {
@@ -18,7 +18,7 @@ export async function organizationsScreen(app) {
     </div>
     <fieldset id="organization-fields" disabled>
       <h2>Dados da organização</h2>
-      <label>Sistema<input name="systemName" value="${esc(SYSTEM_NAME)}" readonly></label><label>ID da Organização<input name="organization" readonly></label>
+      <label>Sistema<input name="systemName" value="${esc(SYSTEM_NAME)}" readonly></label><input name="systemEmail" type="hidden" value="${esc(SYSTEM_EMAIL)}"><label>ID da Organização<input name="organization" readonly></label>
       <label>Nome da Organização*<input name="name" required maxlength="120"></label><label>CPF/CNPJ*<input name="cpfCnpj" required></label>
       <label>Razão social<input name="corporateName" maxlength="160"></label><label>Telefone*<input name="phone" required inputmode="tel"></label>
       <label class="inline-check"><input type="checkbox" name="whatsapp"> Este telefone possui WhatsApp</label><label>Link do sistema*<input name="systemUrl" type="url" required placeholder="https://sistema.com.br/organizacao"></label>

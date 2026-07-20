@@ -5,6 +5,7 @@ import { accessScreen } from './scripts_telas/3_gestao_de_acessos.js';
 import { organizationsScreen } from './scripts_telas/4_gestao_de_organizacoes.js';
 import frontendConfig from './configuracao.json';
 export const SYSTEM_NAME = String(frontendConfig.nome_sistema || 'Sistema').trim();
+export const SYSTEM_EMAIL = String(frontendConfig.email_contato || '').trim().toLowerCase();
 document.title = SYSTEM_NAME;
 export const API_URL = (import.meta.env?.VITE_API_URL || 'https://logins-back.onrender.com').replace(/\/$/, '');
 export const state = { token: sessionStorage.getItem('login_session') || '', session: JSON.parse(sessionStorage.getItem('login_data') || 'null') };
