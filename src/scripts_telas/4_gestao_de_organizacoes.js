@@ -44,7 +44,11 @@ export async function organizationsScreen(app) {
       ? `<p class="notice">Configuração ${esc(readiness.envName)} já detectada.</p>`
       : readiness.automaticProvisioning
         ? `<p class="notice">Provisionador pronto. O projeto Firebase de ${esc(readiness.id)} será criado automaticamente.</p>`
-        : '<p class="error">O provisionador Google Cloud/Render ainda não foi configurado no backend.</p>';
+        : readiness.oauthAvailable
+          ? '<p class="notice">Credenciais detectadas. <button type="button" id="connect-google">Conectar Google Cloud</button></p>'
+          : '<p class="error">O provisionador Google Cloud/Render ainda não foi configurado no backend.</p>';
+    const connect = app.querySelector('#connect-google');
+    if (connect) connect.onclick = async () => { const result = await api('/api/google/oauth/start'); window.open(result.url, 'google-cloud-oauth', 'width=620,height=760'); };
     const checks = [...form.querySelectorAll('.firebase-checks input')];
     if (readiness.automaticProvisioning || readiness.configured) checks.forEach(item => { item.checked = true; item.disabled = true; });
     const ready = readiness.configured || readiness.automaticProvisioning;
