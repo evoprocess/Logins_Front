@@ -26,12 +26,12 @@ export async function organizationsScreen(app) {
       <button type="submit">Cadastrar organização e enviar acesso</button>
     </fieldset><p id="registration-feedback" class="error"></p>
   </form>
-  <section class="organization-danger">
+  <section id="organization-danger" class="organization-danger" hidden>
     <h2>Excluir organização</h2>
     <p><strong>Atenção:</strong> esta ação é irreversível. O cadastro, os acessos e o projeto Firebase da organização serão removidos.</p>
-    <label>Organização a excluir*<select id="delete-organization" required><option value="">Carregando organizações...</option></select></label>
-    <label>Senha administrativa de exclusão*<input id="delete-password" type="password" autocomplete="current-password" required disabled></label>
+    <label>Senha administrativa de exclusão*<input id="delete-password" type="password" autocomplete="current-password" required></label>
     <button type="button" id="authorize-deletion" class="danger-button" disabled>Validar senha para continuar</button>
+    <label>Organização a excluir*<select id="delete-organization" required disabled><option value="">Carregando organizações...</option></select></label>
     <div id="deletion-confirmations" hidden>
       <p class="error"><strong>Confirmação necessária:</strong> não será possível desfazer esta operação.</p>
       <label class="inline-check"><input id="confirm-irreversible" type="checkbox"> Confirmo a exclusão definitiva de todos os dados e acessos desta organização.</label>
@@ -59,6 +59,7 @@ export async function organizationsScreen(app) {
     const deleteSelect = app.querySelector('#delete-organization');
     const removable = organizationData.organizations.filter(item => item.id !== 'ORG_0000');
     deleteSelect.innerHTML = '<option value="">Selecione uma organização</option>' + removable.map(item => `<option value="${esc(item.id)}">${esc(item.id)} — ${esc(item.name)}</option>`).join('');
+    app.querySelector('#organization-danger').hidden = false;
     const deletePassword = app.querySelector('#delete-password');
     const authorizeDeletion = app.querySelector('#authorize-deletion');
     const confirmations = app.querySelector('#deletion-confirmations');
@@ -69,26 +70,27 @@ export async function organizationsScreen(app) {
     const lockDeletion = () => { confirmations.hidden = true; irreversible.checked = false; firebase.checked = false; deleteButton.disabled = true; };
     deleteSelect.onchange = () => {
       lockDeletion();
-      deletePassword.value = '';
-      deletePassword.disabled = !deleteSelect.value;
-      authorizeDeletion.disabled = true;
-      deletionFeedback.textContent = deleteSelect.value ? 'Informe a senha administrativa para continuar.' : '';
+      confirmations.hidden = !deleteSelect.value;
+      deletionFeedback.textContent = deleteSelect.value ? 'Leia e marque as duas confirmações para liberar a exclusão.' : 'Selecione a organização que deseja excluir.';
       deletionFeedback.className = '';
-      if (deleteSelect.value) deletePassword.focus();
     };
-    deletePassword.oninput = () => { lockDeletion(); authorizeDeletion.disabled = !deletePassword.value; };
+    deletePassword.oninput = () => {
+      lockDeletion();
+      deleteSelect.value = '';
+      deleteSelect.disabled = true;
+      authorizeDeletion.disabled = !deletePassword.value;
+    };
     authorizeDeletion.onclick = async () => {
       if (!deleteSelect.value || !deletePassword.value) { deletionFeedback.textContent = 'Selecione a organização e informe a senha administrativa.'; return; }
       deletionFeedback.textContent = 'Validando senha...';
       try {
         await api('/api/organization-deletion/verify', { method: 'POST', body: JSON.stringify({ password: deletePassword.value }) });
-        deleteSelect.disabled = true;
         deletePassword.disabled = true;
         authorizeDeletion.disabled = true;
-        confirmations.hidden = false;
-        deletionFeedback.textContent = 'Senha validada. Leia e marque as duas confirmações para liberar a exclusão.';
+        deleteSelect.disabled = false;
+        deletionFeedback.textContent = 'Senha validada. Agora selecione a organização que deseja excluir.';
         deletionFeedback.className = 'notice';
-      } catch (error) { lockDeletion(); deleteSelect.disabled = false; deletePassword.disabled = false; authorizeDeletion.disabled = !deletePassword.value; deletionFeedback.textContent = error.message; deletionFeedback.className = 'error'; }
+      } catch (error) { lockDeletion(); deleteSelect.disabled = true; deletePassword.disabled = false; authorizeDeletion.disabled = !deletePassword.value; deletionFeedback.textContent = error.message; deletionFeedback.className = 'error'; }
     };
     const synchronizeDeletion = () => { deleteButton.disabled = !(irreversible.checked && firebase.checked); };
     irreversible.onchange = synchronizeDeletion;
@@ -101,7 +103,7 @@ export async function organizationsScreen(app) {
         const result = await api(`/api/organizations/${encodeURIComponent(organization)}`, { method: 'DELETE', body: JSON.stringify({ password: deletePassword.value, confirmOrganization: organization, confirmIrreversible: irreversible.checked, confirmFirebase: firebase.checked }) });
         deletionFeedback.textContent = `${result.organization} e o projeto Firebase ${result.projectId} foram excluídos.`; deletionFeedback.className = 'notice';
         deleteSelect.querySelector(`option[value="${CSS.escape(organization)}"]`)?.remove();
-        deleteSelect.value = ''; deleteSelect.disabled = false; deletePassword.value = ''; deletePassword.disabled = true; authorizeDeletion.disabled = true; lockDeletion();
+        deleteSelect.value = ''; deleteSelect.disabled = true; deletePassword.value = ''; deletePassword.disabled = false; authorizeDeletion.disabled = true; lockDeletion();
       } catch (error) { deletionFeedback.textContent = error.message; deletionFeedback.className = 'error'; synchronizeDeletion(); }
     };
     const synchronizeCorporateName = () => { form.corporateName.required = form.cpfCnpj.value.replace(/\D/g, '').length > 11; };
