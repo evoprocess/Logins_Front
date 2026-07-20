@@ -14,7 +14,7 @@ export async function organizationsScreen(app) {
       <h2>Dados da organização</h2>
       <label>Sistema<input name="systemName" value="${esc(SYSTEM_NAME)}" readonly></label><input name="systemEmail" type="hidden" value="${esc(SYSTEM_EMAIL)}"><label>ID da Organização<input name="organization" readonly></label>
       <label>Nome da Organização*<input name="name" required maxlength="120"></label><label>CPF/CNPJ*<input name="cpfCnpj" required></label>
-      <label>Razão social<input name="corporateName" maxlength="160"></label><label>Telefone*<input name="phone" required inputmode="tel"></label>
+      <label>Razão social* (para CNPJ)<input name="corporateName" maxlength="160"></label><label>Telefone*<input name="phone" required inputmode="tel"></label>
       <label class="inline-check"><input type="checkbox" name="whatsapp"> Este telefone possui WhatsApp</label><label>Link do sistema*<input name="systemUrl" type="url" required placeholder="https://sistema.com.br/organizacao"></label>
       <h2>Dados do administrador</h2>
       <label>Nome do Administrador*<input name="administratorName" required maxlength="120"></label><label>CPF<input name="administratorCpf"></label>
@@ -22,7 +22,7 @@ export async function organizationsScreen(app) {
       <details><summary>Outros destinatários de e-mail</summary>
         <label>E-mail de acessos<input name="accessEmail" type="email"></label><label>E-mail financeiro<input name="financialEmail" type="email"></label><label>E-mail de comunicados<input name="communicationsEmail" type="email"></label>
       </details>
-      <label>Login<input value="gestor" readonly></label><label>E-mail interno do Auth<input name="authEmail" readonly></label>
+      <label>Login<input value="gestor" readonly></label>
       <label>Senha temporária*<div class="password-generator"><input name="temporaryPassword" readonly required><button type="button" id="generate-password">Gerar senha</button></div></label>
       <button type="submit">Cadastrar organização e enviar acesso</button>
     </fieldset><p id="registration-feedback" class="error"></p>
@@ -33,7 +33,6 @@ export async function organizationsScreen(app) {
     const readiness = await api('/api/organization-registration/readiness');
     const form = app.querySelector('#organization-registration');
     form.hidden = false; form.organization.value = readiness.id;
-    form.authEmail.value = `${readiness.id.toLowerCase()}-gestor@sislogin.com.br`;
     app.querySelector('#registration-status').innerHTML = readiness.configured || readiness.automaticProvisioning
       ? ''
         : readiness.oauthAvailable
@@ -44,6 +43,8 @@ export async function organizationsScreen(app) {
     const ready = readiness.configured || readiness.automaticProvisioning;
     app.querySelector('#organization-fields').disabled = !ready;
     app.querySelector('#generate-password').onclick = async () => { form.temporaryPassword.value = (await api('/api/organization-registration/password')).password; };
+    const synchronizeCorporateName = () => { form.corporateName.required = form.cpfCnpj.value.replace(/\D/g, '').length > 11; };
+    form.cpfCnpj.oninput = synchronizeCorporateName;
     form.onsubmit = async event => {
       event.preventDefault();
       const values = Object.fromEntries(new FormData(form));
