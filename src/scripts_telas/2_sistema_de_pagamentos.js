@@ -67,6 +67,7 @@ export async function paymentsScreen(app) {
     form.onsubmit = async event => {
       event.preventDefault();
       const body = Object.fromEntries(new FormData(form));
+      body.organization = form.organization.value;
       body.value = Number(body.value);
       const id = form.dataset.planId;
       try {
