@@ -29,15 +29,17 @@ export async function organizationsScreen(app) {
   <section id="organization-danger" class="organization-danger" hidden>
     <h2>Excluir organização</h2>
     <p><strong>Atenção:</strong> esta ação é irreversível. O cadastro, os acessos e o projeto Firebase da organização serão removidos.</p>
-    <label>Senha administrativa de exclusão*<input id="delete-password" type="password" autocomplete="current-password" required></label>
-    <button type="button" id="authorize-deletion" class="danger-button" disabled>Validar senha para continuar</button>
+    <div class="deletion-password-row">
+      <label>Senha administrativa de exclusão*<input id="delete-password" type="password" autocomplete="current-password" required></label>
+      <button type="button" id="authorize-deletion" class="danger-button" disabled>Validar senha</button>
+    </div>
     <label>Organização a excluir*<select id="delete-organization" required disabled><option value="">Carregando organizações...</option></select></label>
     <div id="deletion-confirmations" hidden>
       <p class="error"><strong>Confirmação necessária:</strong> não será possível desfazer esta operação.</p>
       <label class="inline-check"><input id="confirm-irreversible" type="checkbox"> Confirmo a exclusão definitiva de todos os dados e acessos desta organização.</label>
       <label class="inline-check"><input id="confirm-firebase" type="checkbox"> Confirmo que o projeto Firebase desta organização também será excluído.</label>
-      <button type="button" id="delete-organization-button" class="danger-button" disabled>Excluir organização definitivamente</button>
     </div>
+    <button type="button" id="delete-organization-button" class="danger-button" disabled>Excluir Organização Selecionada</button>
     <p id="deletion-feedback" class="error"></p>
   </section></div>`, 'Cadastro de Organizações');
   bindShell();
