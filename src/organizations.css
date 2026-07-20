@@ -27,4 +27,6 @@
 .danger-button:disabled { opacity: .5; cursor: not-allowed; }
 .deletion-password-row { display: grid; grid-template-columns: minmax(220px, 420px) auto; align-items: end; gap: 12px; }
 .deletion-password-row .danger-button { min-height: 44px; }
+.organization-danger .show-password { display: flex; align-items: center; gap: 7px; font-weight: 600; }
+.organization-danger .show-password input { width: 17px; min-height: 17px; }
 @media (max-width: 600px) { .deletion-password-row { grid-template-columns: 1fr; } }

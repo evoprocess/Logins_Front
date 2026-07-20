@@ -30,7 +30,7 @@ export async function organizationsScreen(app) {
     <h2>Excluir organização</h2>
     <p><strong>Atenção:</strong> esta ação é irreversível. O cadastro, os acessos e o projeto Firebase da organização serão removidos.</p>
     <div class="deletion-password-row">
-      <label>Senha administrativa de exclusão*<input id="delete-password" type="password" autocomplete="current-password" required></label>
+      <label>Senha administrativa de exclusão*<input id="delete-password" type="password" autocomplete="current-password" required><span class="show-password"><input id="show-delete-password" type="checkbox"> Exibir senha</span></label>
       <button type="button" id="authorize-deletion" class="danger-button" disabled>Validar senha</button>
     </div>
     <label>Organização a excluir*<select id="delete-organization" required disabled><option value="">Carregando organizações...</option></select></label>
@@ -63,6 +63,7 @@ export async function organizationsScreen(app) {
     deleteSelect.innerHTML = '<option value="">Selecione uma organização</option>' + removable.map(item => `<option value="${esc(item.id)}">${esc(item.id)} — ${esc(item.name)}</option>`).join('');
     app.querySelector('#organization-danger').hidden = false;
     const deletePassword = app.querySelector('#delete-password');
+    app.querySelector('#show-delete-password').onchange = event => { deletePassword.type = event.target.checked ? 'text' : 'password'; };
     const authorizeDeletion = app.querySelector('#authorize-deletion');
     const confirmations = app.querySelector('#deletion-confirmations');
     const irreversible = app.querySelector('#confirm-irreversible');
@@ -73,7 +74,7 @@ export async function organizationsScreen(app) {
     deleteSelect.onchange = () => {
       lockDeletion();
       confirmations.hidden = !deleteSelect.value;
-      deletionFeedback.textContent = deleteSelect.value ? 'Leia e marque as duas confirmações para liberar a exclusão.' : 'Selecione a organização que deseja excluir.';
+      deletionFeedback.textContent = deleteSelect.value ? 'Leia e marque as duas confirmações para liberar a exclusão.' : '';
       deletionFeedback.className = '';
     };
     deletePassword.oninput = () => {
@@ -83,7 +84,7 @@ export async function organizationsScreen(app) {
       authorizeDeletion.disabled = !deletePassword.value;
     };
     authorizeDeletion.onclick = async () => {
-      if (!deleteSelect.value || !deletePassword.value) { deletionFeedback.textContent = 'Selecione a organização e informe a senha administrativa.'; return; }
+      if (!deletePassword.value) { deletionFeedback.textContent = 'Informe a senha administrativa.'; deletionFeedback.className = 'error'; return; }
       deletionFeedback.textContent = 'Validando senha...';
       try {
         await api('/api/organization-deletion/verify', { method: 'POST', body: JSON.stringify({ password: deletePassword.value }) });
@@ -92,7 +93,7 @@ export async function organizationsScreen(app) {
         deleteSelect.disabled = false;
         deletionFeedback.textContent = 'Senha validada. Agora selecione a organização que deseja excluir.';
         deletionFeedback.className = 'notice';
-      } catch (error) { lockDeletion(); deleteSelect.disabled = true; deletePassword.disabled = false; authorizeDeletion.disabled = !deletePassword.value; deletionFeedback.textContent = error.message; deletionFeedback.className = 'error'; }
+      } catch (error) { lockDeletion(); deleteSelect.disabled = true; deletePassword.disabled = false; authorizeDeletion.disabled = !deletePassword.value; deletionFeedback.textContent = /senha.*incorreta/i.test(error.message) ? 'Senha incorreta.' : error.message; deletionFeedback.className = 'error'; }
     };
     const synchronizeDeletion = () => { deleteButton.disabled = !(irreversible.checked && firebase.checked); };
     irreversible.onchange = synchronizeDeletion;
