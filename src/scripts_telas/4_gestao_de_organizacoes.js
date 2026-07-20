@@ -30,8 +30,8 @@ export async function organizationsScreen(app) {
     <h2>Excluir organização</h2>
     <p><strong>Atenção:</strong> esta ação é irreversível. O cadastro, os acessos e o projeto Firebase da organização serão removidos.</p>
     <label>Organização a excluir*<select id="delete-organization" required><option value="">Carregando organizações...</option></select></label>
-    <label>Senha administrativa de exclusão*<input id="delete-password" type="password" autocomplete="current-password" required></label>
-    <button type="button" id="authorize-deletion" class="danger-button">Validar senha para continuar</button>
+    <label>Senha administrativa de exclusão*<input id="delete-password" type="password" autocomplete="current-password" required disabled></label>
+    <button type="button" id="authorize-deletion" class="danger-button" disabled>Validar senha para continuar</button>
     <div id="deletion-confirmations" hidden>
       <p class="error"><strong>Confirmação necessária:</strong> não será possível desfazer esta operação.</p>
       <label class="inline-check"><input id="confirm-irreversible" type="checkbox"> Confirmo a exclusão definitiva de todos os dados e acessos desta organização.</label>
@@ -60,23 +60,35 @@ export async function organizationsScreen(app) {
     const removable = organizationData.organizations.filter(item => item.id !== 'ORG_0000');
     deleteSelect.innerHTML = '<option value="">Selecione uma organização</option>' + removable.map(item => `<option value="${esc(item.id)}">${esc(item.id)} — ${esc(item.name)}</option>`).join('');
     const deletePassword = app.querySelector('#delete-password');
+    const authorizeDeletion = app.querySelector('#authorize-deletion');
     const confirmations = app.querySelector('#deletion-confirmations');
     const irreversible = app.querySelector('#confirm-irreversible');
     const firebase = app.querySelector('#confirm-firebase');
     const deleteButton = app.querySelector('#delete-organization-button');
     const deletionFeedback = app.querySelector('#deletion-feedback');
     const lockDeletion = () => { confirmations.hidden = true; irreversible.checked = false; firebase.checked = false; deleteButton.disabled = true; };
-    deleteSelect.onchange = lockDeletion;
-    deletePassword.oninput = lockDeletion;
-    app.querySelector('#authorize-deletion').onclick = async () => {
+    deleteSelect.onchange = () => {
+      lockDeletion();
+      deletePassword.value = '';
+      deletePassword.disabled = !deleteSelect.value;
+      authorizeDeletion.disabled = true;
+      deletionFeedback.textContent = deleteSelect.value ? 'Informe a senha administrativa para continuar.' : '';
+      deletionFeedback.className = '';
+      if (deleteSelect.value) deletePassword.focus();
+    };
+    deletePassword.oninput = () => { lockDeletion(); authorizeDeletion.disabled = !deletePassword.value; };
+    authorizeDeletion.onclick = async () => {
       if (!deleteSelect.value || !deletePassword.value) { deletionFeedback.textContent = 'Selecione a organização e informe a senha administrativa.'; return; }
       deletionFeedback.textContent = 'Validando senha...';
       try {
         await api('/api/organization-deletion/verify', { method: 'POST', body: JSON.stringify({ password: deletePassword.value }) });
+        deleteSelect.disabled = true;
+        deletePassword.disabled = true;
+        authorizeDeletion.disabled = true;
         confirmations.hidden = false;
         deletionFeedback.textContent = 'Senha validada. Leia e marque as duas confirmações para liberar a exclusão.';
         deletionFeedback.className = 'notice';
-      } catch (error) { lockDeletion(); deletionFeedback.textContent = error.message; deletionFeedback.className = 'error'; }
+      } catch (error) { lockDeletion(); deleteSelect.disabled = false; deletePassword.disabled = false; authorizeDeletion.disabled = !deletePassword.value; deletionFeedback.textContent = error.message; deletionFeedback.className = 'error'; }
     };
     const synchronizeDeletion = () => { deleteButton.disabled = !(irreversible.checked && firebase.checked); };
     irreversible.onchange = synchronizeDeletion;
@@ -89,7 +101,7 @@ export async function organizationsScreen(app) {
         const result = await api(`/api/organizations/${encodeURIComponent(organization)}`, { method: 'DELETE', body: JSON.stringify({ password: deletePassword.value, confirmOrganization: organization, confirmIrreversible: irreversible.checked, confirmFirebase: firebase.checked }) });
         deletionFeedback.textContent = `${result.organization} e o projeto Firebase ${result.projectId} foram excluídos.`; deletionFeedback.className = 'notice';
         deleteSelect.querySelector(`option[value="${CSS.escape(organization)}"]`)?.remove();
-        deleteSelect.value = ''; deletePassword.value = ''; lockDeletion();
+        deleteSelect.value = ''; deleteSelect.disabled = false; deletePassword.value = ''; deletePassword.disabled = true; authorizeDeletion.disabled = true; lockDeletion();
       } catch (error) { deletionFeedback.textContent = error.message; deletionFeedback.className = 'error'; synchronizeDeletion(); }
     };
     const synchronizeCorporateName = () => { form.corporateName.required = form.cpfCnpj.value.replace(/\D/g, '').length > 11; };
