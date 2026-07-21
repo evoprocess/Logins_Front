@@ -27,9 +27,8 @@ export async function organizationsScreen(app) {
       <details><summary>Outros destinatários de e-mail</summary>
         <label>E-mail de acessos<input name="accessEmail" type="email"></label><label>E-mail financeiro<input name="financialEmail" type="email"></label><label>E-mail de comunicados<input name="communicationsEmail" type="email"></label>
       </details>
-      <label>Login<input value="gestor" readonly></label>
-      <label>Senha temporária*<div class="password-generator"><input name="temporaryPassword" readonly required><button type="button" id="generate-password">Gerar senha</button></div></label>
-      <button type="submit">Cadastrar organização e enviar acesso</button></section>
+      <div class="credential-fields"><label>Login<input value="gestor" readonly></label><label>Senha Temporária*<input name="temporaryPassword" readonly required></label></div>
+      <div class="registration-actions"><button type="button" id="generate-password">Gerar Senha</button><button type="submit" title="Ao cadastrar a organização o acesso será enviado para os e-mails administrativo e de acessos">Cadastrar Organização</button></div></section>
     </fieldset><p id="registration-feedback" class="error"></p>
   </form>
   <section id="organization-danger" class="organization-danger" hidden>

@@ -20,7 +20,7 @@
 .organization-form .document-type-selector label { display: block; cursor: pointer; }
 .organization-form .document-type-selector input { position: absolute; width: 1px; min-height: 1px; opacity: 0; }
 .document-type-selector span { display: grid; height: 100%; place-items: center; border-radius: 6px; color: #667085; transition: background .15s, color .15s, box-shadow .15s; }
-.document-type-selector input:checked + span { background: #2962ff; color: #fff; box-shadow: 0 1px 3px rgb(16 24 40 / 18%); }
+.document-type-selector input:checked + span { background: #142b4f; color: #fff; box-shadow: 0 1px 3px rgb(16 24 40 / 18%); }
 .document-type-selector input:focus-visible + span { outline: 2px solid #84adff; outline-offset: 1px; }
 .organization-form input[readonly] { background: #f2f4f7; color: #475467; }
 .phone-field { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px; }
@@ -30,8 +30,12 @@
 .firebase-checks input, .organization-form .inline-check input { width: 18px; min-height: 18px; }
 .organization-form details { padding: 14px; border: 1px solid #e4e7ec; border-radius: 10px; }
 .organization-form details label { margin-top: 12px; }
-.password-generator { display: flex; gap: 8px; }
-.password-generator button, .organization-form button[type="submit"] { padding: 11px 16px; border: 0; border-radius: 9px; background: #2962ff; color: #fff; font-weight: 800; cursor: pointer; }
+.credential-fields, .registration-actions { display: grid; align-content: start; gap: 14px; }
+.registration-actions { padding-top: 1px; }
+.registration-actions button { min-height: 44px; padding: 11px 16px; border: 0; border-radius: 9px; color: #fff; font-weight: 800; cursor: pointer; }
+.registration-actions #generate-password { background: #142b4f; }
+.organization-form .registration-actions button[type="submit"] { min-height: 50px; background: #155eef; box-shadow: 0 4px 10px rgb(21 94 239 / 28%); font-size: 15px; }
+.registration-actions button:hover { filter: brightness(1.08); }
 .organization-form fieldset:disabled { opacity: .55; }
 @media (max-width: 700px) { .organization-form .form-section, .firebase-checks { grid-template-columns: 1fr; } }
 .organization-danger { margin-top: 34px; padding: 20px; border: 2px solid #d92d20; border-radius: 12px; background: #fff6f5; display: grid; gap: 14px; }
