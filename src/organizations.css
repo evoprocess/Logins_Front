@@ -4,6 +4,7 @@
 .organization-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
 .organization-form input, .organization-form select { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #d0d5dd; border-radius: 9px; background: #fff; }
 .organization-form input:disabled { background: #f2f4f7; color: #98a2b3; cursor: not-allowed; }
+.organization-main-fields { display: grid; align-content: start; gap: 14px; }
 .document-type-field { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
 .document-group { display: grid; align-self: start; overflow: hidden; border: 1px solid #b8c0cc; border-radius: 11px; background: #fff; box-shadow: 0 1px 2px rgb(16 24 40 / 5%); }
 .document-group > .is-invisible { visibility: hidden; pointer-events: none; }
