@@ -1,7 +1,8 @@
 .organization-form h2 { grid-column: 1 / -1; margin: 0; }
 .organization-form fieldset { display: grid; gap: 22px; padding: 0; border: 0; }
+.organization-form .form-section-title { margin: 8px 0 -10px; }
 .organization-form .form-section { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 14px; padding: 20px; border: 1px solid #b8c0cc; border-radius: 12px; background: #fff; box-shadow: 0 1px 3px rgb(16 24 40 / 8%); }
-.organization-form .form-section > h2, .organization-form .form-section > details, .organization-form .form-section > button { grid-column: 1 / -1; }
+.organization-form .form-section > details, .organization-form .form-section > button { grid-column: 1 / -1; }
 .organization-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
 .organization-form input, .organization-form select { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #d0d5dd; border-radius: 9px; background: #fff; }
 .organization-form input:disabled { background: #f2f4f7; color: #98a2b3; cursor: not-allowed; }
