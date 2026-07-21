@@ -13,8 +13,9 @@ export async function organizationsScreen(app) {
     <fieldset id="organization-fields" disabled>
       <h2>Dados da organização</h2>
       <label>Sistema<input name="systemName" value="${esc(SYSTEM_NAME)}" readonly></label><input name="systemEmail" type="hidden" value="${esc(SYSTEM_EMAIL)}"><input name="systemUrl" type="hidden" value="${esc(SYSTEM_URL)}"><label>ID da Organização<input name="organization" readonly></label>
-      <label>Nome da Organização*<input name="name" required maxlength="120"></label><label>CPF/CNPJ*<input name="cpfCnpj" required></label>
-      <label>Razão social* (para CNPJ)<input name="corporateName" maxlength="160"></label><div class="phone-field"><label>Telefone*<input name="phone" required inputmode="tel"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Este telefone possui WhatsApp</label></div>
+      <label>Nome da Organização*<input name="name" required maxlength="120"></label><label>Tipo de documento*<select name="documentType" required><option value="CNPJ">CNPJ</option><option value="CPF">CPF</option></select></label>
+      <label><span id="organization-document-label">CNPJ*</span><input name="cpfCnpj" required inputmode="numeric"></label><label>Razão social* (para CNPJ)<input name="corporateName" maxlength="160" required></label>
+      <div class="phone-field"><label>Telefone*<input name="phone" required inputmode="tel"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Este telefone possui WhatsApp</label></div>
       <h2>Dados do administrador</h2>
       <label>Nome do Administrador*<input name="administratorName" required maxlength="120"></label><label>CPF*<input name="administratorCpf" required inputmode="numeric"></label>
       <label>Cargo*<input name="administratorRole" required maxlength="100"></label><label>E-mail administrativo*<input name="adminEmail" type="email" required></label>
@@ -109,8 +110,16 @@ export async function organizationsScreen(app) {
         deleteSelect.value = ''; deleteSelect.disabled = true; deletePassword.value = ''; deletePassword.disabled = false; authorizeDeletion.disabled = true; lockDeletion();
       } catch (error) { deletionFeedback.textContent = error.message; deletionFeedback.className = 'error'; synchronizeDeletion(); }
     };
-    const synchronizeCorporateName = () => { form.corporateName.required = form.cpfCnpj.value.replace(/\D/g, '').length > 11; };
-    form.cpfCnpj.oninput = synchronizeCorporateName;
+    const synchronizeDocumentType = () => {
+      const isCnpj = form.documentType.value === 'CNPJ';
+      app.querySelector('#organization-document-label').textContent = `${isCnpj ? 'CNPJ' : 'CPF'}*`;
+      form.cpfCnpj.placeholder = isCnpj ? '00.000.000/0000-00' : '000.000.000-00';
+      form.corporateName.required = isCnpj;
+      form.corporateName.disabled = !isCnpj;
+      if (!isCnpj) form.corporateName.value = '';
+    };
+    form.documentType.onchange = synchronizeDocumentType;
+    synchronizeDocumentType();
     form.onsubmit = async event => {
       event.preventDefault();
       const values = Object.fromEntries(new FormData(form));

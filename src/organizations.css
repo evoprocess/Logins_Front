@@ -2,7 +2,8 @@
 .organization-form fieldset { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0; border: 0; }
 .organization-form fieldset > h2, .organization-form fieldset > details, .organization-form fieldset > button { grid-column: 1 / -1; }
 .organization-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
-.organization-form input { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #d0d5dd; border-radius: 9px; }
+.organization-form input, .organization-form select { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #d0d5dd; border-radius: 9px; background: #fff; }
+.organization-form input:disabled { background: #f2f4f7; color: #98a2b3; cursor: not-allowed; }
 .organization-form input[readonly] { background: #f2f4f7; color: #475467; }
 .phone-field { display: grid; gap: 10px; }
 .firebase-checks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
