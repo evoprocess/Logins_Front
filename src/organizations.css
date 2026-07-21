@@ -4,6 +4,19 @@
 .organization-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
 .organization-form input, .organization-form select { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #d0d5dd; border-radius: 9px; background: #fff; }
 .organization-form input:disabled { background: #f2f4f7; color: #98a2b3; cursor: not-allowed; }
+.document-type-field { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
+.document-group { display: grid; align-self: start; overflow: hidden; border: 1px solid #b8c0cc; border-radius: 11px; background: #fff; box-shadow: 0 1px 2px rgb(16 24 40 / 5%); }
+.document-group > * { padding: 12px; }
+.document-group > * + * { border-top: 1px solid #e4e7ec; }
+.organization-form .document-group input:not([type="radio"]) { border-color: transparent; background: #f9fafb; }
+.organization-form .document-group input:not([type="radio"]):focus { border-color: #2962ff; outline: 0; box-shadow: 0 0 0 3px rgb(41 98 255 / 12%); }
+.organization-form .document-group input:disabled { background: #f2f4f7; }
+.document-type-selector { display: grid; grid-template-columns: 1fr 1fr; min-height: 44px; padding: 3px; border: 1px solid #d0d5dd; border-radius: 9px; background: #f2f4f7; }
+.organization-form .document-type-selector label { display: block; cursor: pointer; }
+.organization-form .document-type-selector input { position: absolute; width: 1px; min-height: 1px; opacity: 0; }
+.document-type-selector span { display: grid; height: 100%; place-items: center; border-radius: 6px; color: #667085; transition: background .15s, color .15s, box-shadow .15s; }
+.document-type-selector input:checked + span { background: #2962ff; color: #fff; box-shadow: 0 1px 3px rgb(16 24 40 / 18%); }
+.document-type-selector input:focus-visible + span { outline: 2px solid #84adff; outline-offset: 1px; }
 .organization-form input[readonly] { background: #f2f4f7; color: #475467; }
 .phone-field { display: grid; gap: 10px; }
 .firebase-checks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
