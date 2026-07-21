@@ -37,6 +37,8 @@
 .organization-form .registration-actions button[type="submit"] { min-height: 50px; background: #155eef; box-shadow: 0 4px 10px rgb(21 94 239 / 28%); font-size: 15px; }
 .registration-actions button:hover { filter: brightness(1.08); }
 .organization-form fieldset:disabled { opacity: .55; }
+.registration-progress { display: grid; gap: 6px; margin-top: 16px; padding: 14px; border: 1px solid #84adff; border-radius: 10px; background: #eff4ff; color: #142b4f; }
+.registration-progress small { color: #475467; }
 @media (max-width: 700px) { .organization-form .form-section, .firebase-checks { grid-template-columns: 1fr; } }
 .organization-danger { margin-top: 34px; padding: 20px; border: 2px solid #d92d20; border-radius: 12px; background: #fff6f5; display: grid; gap: 14px; }
 .organization-danger[hidden] { display: none; }

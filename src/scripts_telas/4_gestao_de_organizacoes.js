@@ -133,12 +133,22 @@ export async function organizationsScreen(app) {
       const values = Object.fromEntries(new FormData(form));
       values.whatsapp = form.whatsapp.checked;
       const feedback = app.querySelector('#registration-feedback');
-      feedback.textContent = 'Cadastrando organização...'; feedback.className = '';
+      const submit = form.querySelector('button[type="submit"]');
+      submit.disabled = true;
+      feedback.textContent = 'Iniciando o cadastro...'; feedback.className = 'registration-progress';
       try {
-        const result = await api('/api/organization-registration', { method: 'POST', body: JSON.stringify(values) });
+        const { jobId } = await api('/api/organization-registration/jobs', { method: 'POST', body: JSON.stringify(values) });
+        let status;
+        do {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          status = await api(`/api/organization-registration/jobs/${encodeURIComponent(jobId)}`);
+          feedback.innerHTML = `<strong>Criação em andamento</strong><span>${esc(status.message)}</span><small>Este processo pode levar até 5 minutos. Não feche esta página.</small>`;
+        } while (status.state === 'processing');
+        if (status.state === 'failed') throw new Error(status.error || 'Não foi possível concluir o cadastro.');
+        const result = status.result;
         feedback.textContent = `${result.organization} cadastrada. Acesso enviado para ${result.recipients.join(', ')}.`; feedback.className = 'notice';
         form.querySelector('fieldset').disabled = true;
-      } catch (error) { feedback.textContent = error.message; feedback.className = 'error'; }
+      } catch (error) { feedback.textContent = error.message; feedback.className = 'error'; submit.disabled = false; }
     };
   } catch (error) { app.querySelector('#registration-status').innerHTML = `<p class="error">${esc(error.message)}</p>`; }
 }
