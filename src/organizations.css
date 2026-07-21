@@ -4,13 +4,15 @@
 .organization-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
 .organization-form input, .organization-form select { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #d0d5dd; border-radius: 9px; background: #fff; }
 .organization-form input:disabled { background: #f2f4f7; color: #98a2b3; cursor: not-allowed; }
+.system-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.system-fields > label { grid-column: 1; }
 .organization-main-fields { display: grid; align-content: start; gap: 14px; }
 .document-type-field { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
 .document-group { display: grid; align-self: start; overflow: hidden; border: 1px solid #b8c0cc; border-radius: 11px; background: #fff; box-shadow: 0 1px 2px rgb(16 24 40 / 5%); }
 .document-group > .is-invisible { visibility: hidden; pointer-events: none; }
 .document-group > * { padding: 12px; }
 .document-group > * + * { border-top: 1px solid #e4e7ec; }
-.organization-form .document-group input:not([type="radio"]) { border-color: transparent; background: #f9fafb; }
+.organization-form .document-group input:not([type="radio"]) { border-color: #101828; background: #fff; }
 .organization-form .document-group input:not([type="radio"]):focus { border-color: #2962ff; outline: 0; box-shadow: 0 0 0 3px rgb(41 98 255 / 12%); }
 .organization-form .document-group input:disabled { background: #f2f4f7; }
 .document-type-selector { display: grid; grid-template-columns: 1fr 1fr; min-height: 44px; padding: 3px; border: 1px solid #d0d5dd; border-radius: 9px; background: #f2f4f7; }
@@ -29,7 +31,7 @@
 .password-generator { display: flex; gap: 8px; }
 .password-generator button, .organization-form button[type="submit"] { padding: 11px 16px; border: 0; border-radius: 9px; background: #2962ff; color: #fff; font-weight: 800; cursor: pointer; }
 .organization-form fieldset:disabled { opacity: .55; }
-@media (max-width: 700px) { .organization-form fieldset, .firebase-checks { grid-template-columns: 1fr; } }
+@media (max-width: 700px) { .organization-form fieldset, .firebase-checks, .system-fields { grid-template-columns: 1fr; } }
 .organization-danger { margin-top: 34px; padding: 20px; border: 2px solid #d92d20; border-radius: 12px; background: #fff6f5; display: grid; gap: 14px; }
 .organization-danger[hidden] { display: none; }
 .organization-danger h2, .organization-danger p { margin: 0; }
