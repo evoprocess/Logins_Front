@@ -13,10 +13,10 @@ export async function organizationsScreen(app) {
   app.innerHTML = shell(`<div class="panel"><div id="registration-status">Verificando configuração...</div><form id="organization-registration" class="organization-form" hidden>
     <fieldset id="organization-fields" disabled>
       <h2>Dados da organização</h2>
-      <div class="system-fields"><label>Sistema<input name="systemName" value="${esc(SYSTEM_NAME)}" readonly></label><input name="systemEmail" type="hidden" value="${esc(SYSTEM_EMAIL)}"><input name="systemUrl" type="hidden" value="${esc(SYSTEM_URL)}"><label>ID da Organização<input name="organization" readonly></label></div>
+      <div class="organization-left-column"><div class="system-fields"><label>Sistema<input name="systemName" value="${esc(SYSTEM_NAME)}" readonly></label><input name="systemEmail" type="hidden" value="${esc(SYSTEM_EMAIL)}"><input name="systemUrl" type="hidden" value="${esc(SYSTEM_URL)}"><label>ID da Organização<input name="organization" readonly></label></div>
       <div class="organization-main-fields"><label>Nome da Organização*<input name="name" required maxlength="120"></label>
         <div class="phone-field"><label>Telefone*<input name="phone" required inputmode="tel"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Este telefone possui WhatsApp</label></div>
-      </div><div class="document-group">
+      </div></div><div class="document-group">
         <div class="document-type-field"><span>Tipo de documento*</span><div class="document-type-selector" role="radiogroup" aria-label="Tipo de documento"><label><input type="radio" name="documentType" value="CPF" required><span>CPF</span></label><label><input type="radio" name="documentType" value="CNPJ" required checked><span>CNPJ</span></label></div></div>
         <label><span id="organization-document-label">CNPJ*</span><input name="cpfCnpj" required inputmode="numeric"></label>
         <label id="corporate-name-field">Razão social*<input name="corporateName" maxlength="160" required></label>
