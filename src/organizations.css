@@ -6,7 +6,7 @@
 .organization-form input:disabled { background: #f2f4f7; color: #98a2b3; cursor: not-allowed; }
 .document-type-field { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
 .document-group { display: grid; align-self: start; overflow: hidden; border: 1px solid #b8c0cc; border-radius: 11px; background: #fff; box-shadow: 0 1px 2px rgb(16 24 40 / 5%); }
-.document-group > [hidden] { display: none; }
+.document-group > .is-invisible { visibility: hidden; pointer-events: none; }
 .document-group > * { padding: 12px; }
 .document-group > * + * { border-top: 1px solid #e4e7ec; }
 .organization-form .document-group input:not([type="radio"]) { border-color: transparent; background: #f9fafb; }

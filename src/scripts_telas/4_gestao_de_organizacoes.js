@@ -120,7 +120,7 @@ export async function organizationsScreen(app) {
       form.cpfCnpj.placeholder = isCnpj ? '00.000.000/0000-00' : '000.000.000-00';
       form.corporateName.required = isCnpj;
       form.corporateName.disabled = !isCnpj;
-      app.querySelector('#corporate-name-field').hidden = !isCnpj;
+      app.querySelector('#corporate-name-field').classList.toggle('is-invisible', !isCnpj);
       if (!isCnpj) form.corporateName.value = '';
       validateOrganizationDocument();
     };
