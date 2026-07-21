@@ -12,16 +12,16 @@ export async function organizationsScreen(app) {
   if (state.session.organization.id !== 'ORG_0000' || state.session.user.role !== 'admin') return;
   app.innerHTML = shell(`<div class="panel"><div id="registration-status">Verificando configuração...</div><form id="organization-registration" class="organization-form" hidden>
     <fieldset id="organization-fields" disabled>
-      <h2>Dados da organização</h2>
+      <section class="form-section"><h2>Dados da organização</h2>
       <div class="organization-left-column"><div class="system-fields"><label>Sistema<input name="systemName" value="${esc(SYSTEM_NAME)}" readonly></label><input name="systemEmail" type="hidden" value="${esc(SYSTEM_EMAIL)}"><input name="systemUrl" type="hidden" value="${esc(SYSTEM_URL)}"><label>ID da Organização<input name="organization" readonly></label></div>
       <div class="organization-main-fields"><label>Nome da Organização*<input name="name" required maxlength="120"></label>
-        <div class="phone-field"><label>Telefone*<input name="phone" required inputmode="tel"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Este telefone possui WhatsApp</label></div>
+        <div class="phone-field"><label>Telefone*<input name="phone" required inputmode="tel"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Whatsapp</label></div>
       </div></div><div class="document-group">
         <div class="document-type-field"><span>Tipo de documento*</span><div class="document-type-selector" role="radiogroup" aria-label="Tipo de documento"><label><input type="radio" name="documentType" value="CPF" required><span>CPF</span></label><label><input type="radio" name="documentType" value="CNPJ" required checked><span>CNPJ</span></label></div></div>
         <label><span id="organization-document-label">CNPJ*</span><input name="cpfCnpj" required inputmode="numeric"></label>
         <label id="corporate-name-field">Razão social*<input name="corporateName" maxlength="160" required></label>
-      </div>
-      <h2>Dados do administrador</h2>
+      </div></section>
+      <section class="form-section"><h2>Dados do administrador</h2>
       <label>Nome do Administrador*<input name="administratorName" required maxlength="120"></label><label>CPF*<input name="administratorCpf" required inputmode="numeric"></label>
       <label>Cargo*<input name="administratorRole" required maxlength="100"></label><label>E-mail administrativo*<input name="adminEmail" type="email" required></label>
       <details><summary>Outros destinatários de e-mail</summary>
@@ -29,7 +29,7 @@ export async function organizationsScreen(app) {
       </details>
       <label>Login<input value="gestor" readonly></label>
       <label>Senha temporária*<div class="password-generator"><input name="temporaryPassword" readonly required><button type="button" id="generate-password">Gerar senha</button></div></label>
-      <button type="submit">Cadastrar organização e enviar acesso</button>
+      <button type="submit">Cadastrar organização e enviar acesso</button></section>
     </fieldset><p id="registration-feedback" class="error"></p>
   </form>
   <section id="organization-danger" class="organization-danger" hidden>
