@@ -1,5 +1,6 @@
 import { api, state, shell, bindShell, SYSTEM_NAME, SYSTEM_EMAIL, SYSTEM_URL } from '../main.js';
 import '../organizations.css';
+import { bindDocumentValidation } from '../document-validation.js';
 
 const esc = value => {
   const element = document.createElement('span');
@@ -121,7 +122,10 @@ export async function organizationsScreen(app) {
       form.corporateName.disabled = !isCnpj;
       app.querySelector('#corporate-name-field').hidden = !isCnpj;
       if (!isCnpj) form.corporateName.value = '';
+      validateOrganizationDocument();
     };
+    const validateOrganizationDocument = bindDocumentValidation(form.cpfCnpj, () => form.documentType.value);
+    bindDocumentValidation(form.administratorCpf, () => 'CPF');
     form.querySelectorAll('input[name="documentType"]').forEach(input => { input.onchange = synchronizeDocumentType; });
     synchronizeDocumentType();
     form.onsubmit = async event => {

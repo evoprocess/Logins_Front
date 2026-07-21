@@ -1,5 +1,6 @@
 import { api, state, shell, bindShell } from '../main.js';
 import '../payments.css';
+import { bindDocumentValidation } from '../document-validation.js';
 
 const esc = value => {
   const element = document.createElement('span');
@@ -57,6 +58,8 @@ export async function paymentsScreen(app) {
   const form = app.querySelector('#plan-form');
   if (form) {
     const extraForm = app.querySelector('#extra-form');
+    bindDocumentValidation(form.cpfCnpj);
+    bindDocumentValidation(extraForm.cpfCnpj);
     form.nextDueDate.value = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
     extraForm.dueDate.value = form.nextDueDate.value;
     try {
