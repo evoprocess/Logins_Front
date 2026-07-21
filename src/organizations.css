@@ -30,9 +30,9 @@
 .firebase-checks input, .organization-form .inline-check input { width: 18px; min-height: 18px; }
 .organization-form details { padding: 14px; border: 1px solid #e4e7ec; border-radius: 10px; }
 .organization-form details label { margin-top: 12px; }
-.credential-fields, .registration-actions { display: grid; align-content: start; gap: 14px; }
-.registration-actions { padding-top: 1px; }
-.registration-actions button { min-height: 44px; padding: 11px 16px; border: 0; border-radius: 9px; color: #fff; font-weight: 800; cursor: pointer; }
+.credential-fields, .registration-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.registration-actions { align-self: end; }
+.registration-actions button { min-height: 50px; padding: 11px 16px; border: 0; border-radius: 9px; color: #fff; font-weight: 800; cursor: pointer; }
 .registration-actions #generate-password { background: #142b4f; }
 .organization-form .registration-actions button[type="submit"] { min-height: 50px; background: #155eef; box-shadow: 0 4px 10px rgb(21 94 239 / 28%); font-size: 15px; }
 .registration-actions button:hover { filter: brightness(1.08); }
