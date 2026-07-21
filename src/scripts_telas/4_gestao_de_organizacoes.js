@@ -16,7 +16,7 @@ export async function organizationsScreen(app) {
       <label>Nome da Organização*<input name="name" required maxlength="120"></label><div class="document-group">
         <div class="document-type-field"><span>Tipo de documento*</span><div class="document-type-selector" role="radiogroup" aria-label="Tipo de documento"><label><input type="radio" name="documentType" value="CPF" required><span>CPF</span></label><label><input type="radio" name="documentType" value="CNPJ" required checked><span>CNPJ</span></label></div></div>
         <label><span id="organization-document-label">CNPJ*</span><input name="cpfCnpj" required inputmode="numeric"></label>
-        <label>Razão social* (para CNPJ)<input name="corporateName" maxlength="160" required></label>
+        <label id="corporate-name-field">Razão social*<input name="corporateName" maxlength="160" required></label>
       </div>
       <div class="phone-field"><label>Telefone*<input name="phone" required inputmode="tel"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Este telefone possui WhatsApp</label></div>
       <h2>Dados do administrador</h2>
@@ -119,6 +119,7 @@ export async function organizationsScreen(app) {
       form.cpfCnpj.placeholder = isCnpj ? '00.000.000/0000-00' : '000.000.000-00';
       form.corporateName.required = isCnpj;
       form.corporateName.disabled = !isCnpj;
+      app.querySelector('#corporate-name-field').hidden = !isCnpj;
       if (!isCnpj) form.corporateName.value = '';
     };
     form.querySelectorAll('input[name="documentType"]').forEach(input => { input.onchange = synchronizeDocumentType; });
