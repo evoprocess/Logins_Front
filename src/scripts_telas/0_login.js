@@ -1,4 +1,10 @@
-import { API_URL, PUBLIC_IMAGES_URL, state, navigate } from '../main.js';
+import { API_URL, ORGANIZATION_IMAGES_URL, PUBLIC_IMAGES_URL, state, navigate } from '../main.js';
+
+const esc = value => {
+  const element = document.createElement('span');
+  element.textContent = String(value ?? '');
+  return element.innerHTML;
+};
 
 export function loginScreen(app, options = {}) {
   const modal = document.createElement('div');
@@ -12,6 +18,7 @@ export function loginScreen(app, options = {}) {
       <button class="login-close" type="button" data-close-login aria-label="Fechar login">&times;</button>
       <div class="brand"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"></div>
       <div class="login-heading"><span>ÁREA SEGURA</span><h2 id="login-title">Acesse sua conta</h2><p>Entre com os dados fornecidos pela sua organização.</p></div>
+      ${options.organizationName ? `<div class="login-store"><img src="${ORGANIZATION_IMAGES_URL}/${encodeURIComponent(options.organization)}/logo.png" alt=""><div><small>Você está entrando em</small><strong>${esc(options.organizationName)}</strong></div></div>` : ''}
       <form id="login-form">
         <label>ORGANIZAÇÃO<input name="organization" placeholder="ORG_XXXX" required></label>
         <label>LOGIN<input name="login" placeholder="Digite seu login" required></label>

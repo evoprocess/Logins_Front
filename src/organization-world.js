@@ -42,8 +42,8 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   container.append(start, prompt);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x07101d);
-  scene.fog = new THREE.Fog(0x07101d, 18, 52);
+  scene.background = new THREE.Color(0xdce8f2);
+  scene.fog = new THREE.Fog(0xdce8f2, 28, 62);
   const camera = new THREE.PerspectiveCamera(70, 1, .1, 100);
   camera.position.set(0, 1.7, 4);
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -61,16 +61,17 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   let floorId = 1;
   let nearby = null;
 
-  scene.add(new THREE.HemisphereLight(0xcde9ff, 0x132035, 1.65));
-  const mainLight = new THREE.DirectionalLight(0xffffff, 1.7);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x7f96aa, 2.7));
+  scene.add(new THREE.AmbientLight(0xffffff, 1.15));
+  const mainLight = new THREE.DirectionalLight(0xffffff, 2.5);
   mainLight.position.set(2, 8, 4); mainLight.castShadow = true; scene.add(mainLight);
-  const blueLight = new THREE.PointLight(0x168cff, 22, 24, 2);
+  const blueLight = new THREE.PointLight(0x59b8ff, 13, 27, 2);
   blueLight.position.set(0, 2.6, -12); scene.add(blueLight);
 
   const materials = {
-    floor: new THREE.MeshStandardMaterial({ color: 0x28394b, metalness: .68, roughness: .38 }),
-    ceiling: new THREE.MeshStandardMaterial({ color: 0xcad4dd, metalness: .75, roughness: .3 }),
-    wall: new THREE.MeshStandardMaterial({ color: 0x40536a, metalness: .45, roughness: .5 }),
+    floor: new THREE.MeshStandardMaterial({ color: 0x617b91, metalness: .42, roughness: .52 }),
+    ceiling: new THREE.MeshStandardMaterial({ color: 0xf4f7fa, metalness: .18, roughness: .68 }),
+    wall: new THREE.MeshStandardMaterial({ color: 0xd2dce5, metalness: .12, roughness: .72 }),
     door: new THREE.MeshStandardMaterial({ color: 0x0b2842, metalness: .72, roughness: .22, emissive: 0x06274a, emissiveIntensity: .45 }),
     blocked: new THREE.MeshStandardMaterial({ color: 0x58636d, metalness: .4, roughness: .7 })
   };
@@ -87,6 +88,9 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   box(10, .15, 48, materials.ceiling, 0, 4.3, -18);
   box(.25, 4.4, 48, materials.wall, -5, 2.1, -18);
   box(.25, 4.4, 48, materials.wall, 5, 2.1, -18);
+  for (let z = 4; z > -43; z -= 4) {
+    box(9.7, .025, .045, new THREE.MeshBasicMaterial({ color: 0x91a9bd }), 0, .015, z);
+  }
   for (let z = 2; z > -42; z -= 6) {
     const strip = box(7.5, .04, .12, new THREE.MeshBasicMaterial({ color: 0x8bd1ff }), 0, 4.2, z);
     strip.castShadow = false;
@@ -97,7 +101,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
       const child = staircase.children.pop();
       child.geometry?.dispose(); child.material?.dispose();
     }
-    const stepMaterial = new THREE.MeshStandardMaterial({ color: 0x8b9bab, metalness: .72, roughness: .3 });
+    const stepMaterial = new THREE.MeshStandardMaterial({ color: 0x708ba1, metalness: .48, roughness: .42 });
     const direction = id === 1 ? 1 : -1;
     for (let index = 0; index < 9; index += 1) {
       const step = new THREE.Mesh(new THREE.BoxGeometry(3.2, .22 + index * .23, .72), stepMaterial);
@@ -129,7 +133,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
       const row = Math.floor(index / 2);
       const z = -5 - row * 11;
       const group = new THREE.Group();
-      const frame = new THREE.Mesh(new THREE.BoxGeometry(2.8, 3.2, .45), new THREE.MeshStandardMaterial({ color: 0x9ba9b6, metalness: .72, roughness: .28 }));
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(2.8, 3.2, .45), new THREE.MeshStandardMaterial({ color: 0xf0f3f6, metalness: .38, roughness: .4 }));
       const doorMaterial = organization.status === 'active' ? materials.door.clone() : materials.blocked.clone();
       const door = new THREE.Mesh(new THREE.BoxGeometry(1.65, 2.35, .18), doorMaterial);
       door.position.set(0, -.35, side > 0 ? -.31 : .31);
@@ -161,28 +165,30 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     prompt.textContent = `Piso ${id} — caminhe até uma porta`;
   }
 
-  function enterNearby() {
-    if (nearby?.organization.status === 'active') {
+  function enterNearby(target = nearby) {
+    if (target?.organization.status === 'active') {
       controls.unlock();
-      openLogin(nearby.organization.id);
+      openLogin(target.organization.id, target.organization.name);
     }
   }
   const keyState = (event, pressed) => {
-    if (controls.isLocked && ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyE', 'Enter', 'Space'].includes(event.code)) {
+    if (controls.isLocked && ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Space'].includes(event.code)) {
       event.preventDefault();
     }
     if (['KeyW', 'ArrowUp'].includes(event.code)) keys.forward = pressed;
     if (['KeyS', 'ArrowDown'].includes(event.code)) keys.backward = pressed;
     if (['KeyA', 'ArrowLeft'].includes(event.code)) keys.left = pressed;
     if (['KeyD', 'ArrowRight'].includes(event.code)) keys.right = pressed;
-    if (pressed && ['KeyE', 'Enter'].includes(event.code)) enterNearby();
+    if (pressed && ['Enter', 'Space'].includes(event.code)) enterNearby();
   };
   const onKeyDown = event => keyState(event, true);
   const onKeyUp = event => keyState(event, false);
   document.addEventListener('keydown', onKeyDown);
   document.addEventListener('keyup', onKeyUp);
   start.onclick = () => controls.lock();
-  renderer.domElement.addEventListener('click', () => { if (!controls.isLocked) controls.lock(); });
+  renderer.domElement.addEventListener('click', () => {
+    if (!controls.isLocked) controls.lock();
+  });
   const stopPageScroll = event => { if (controls.isLocked) event.preventDefault(); };
   controls.addEventListener('lock', () => {
     start.hidden = true;
@@ -244,7 +250,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     if (!available) nearby = null;
     enterButton.disabled = !(nearby?.organization.status === 'active');
     prompt.textContent = nearby
-      ? nearby.organization.status === 'active' ? `${nearby.organization.name} — pressione E para entrar` : 'Sala em construção...'
+      ? nearby.organization.status === 'active' ? `${nearby.organization.name} — pressione Espaço ou Enter` : 'Sala em construção...'
       : `Piso ${floorId} — use WASD e o mouse`;
     renderer.render(scene, camera);
   }
