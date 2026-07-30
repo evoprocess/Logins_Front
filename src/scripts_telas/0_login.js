@@ -8,6 +8,7 @@ const esc = value => {
 };
 
 export function loginScreen(app, options = {}) {
+  const gateGuardAccess = options.organization === 'ORG_0000';
   const modal = document.createElement('div');
   modal.className = 'login-modal';
   modal.setAttribute('role', 'dialog');
@@ -18,9 +19,9 @@ export function loginScreen(app, options = {}) {
     <section class="login-card">
       <button class="login-close" type="button" data-close-login aria-label="Fechar login">&times;</button>
       <div class="brand"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"></div>
-      <div class="login-heading"><span>ÁREA DA ORGANIZAÇÃO</span><h2 id="login-title">Acesso à plataforma</h2><p>Login destinado à organização para administrar sua conta e os pagamentos do GateGuard.</p></div>
+      <div class="login-heading"><span>${gateGuardAccess ? 'ACESSO INTERNO GATEGUARD' : 'ÁREA DA ORGANIZAÇÃO'}</span><h2 id="login-title">${gateGuardAccess ? 'Funcionários e administradores' : 'Acesso à plataforma'}</h2><p>${gateGuardAccess ? 'Área exclusiva da equipe administrativa do GateGuard.' : 'Login destinado à organização para administrar sua conta e os pagamentos do GateGuard.'}</p></div>
       ${options.organizationName ? `<div class="login-store"><img src="${options.organization === 'ORG_0000' ? `${PUBLIC_IMAGES_URL}/gateguard_logo.png` : `${ORGANIZATION_IMAGES_URL}/${encodeURIComponent(options.organization)}/logo.png`}" alt=""><div><small>Você está entrando em</small><strong>${esc(options.organizationName)}</strong></div></div>` : ''}
-      <aside class="client-access" id="client-access">
+      <aside class="client-access" id="client-access" ${gateGuardAccess ? 'hidden' : ''}>
         <div><span>VOCÊ É CLIENTE?</span><strong id="client-organization-name">Acesse pelo site da sua organização</strong><small id="client-access-message">Informe a organização para localizar o portal correto.</small></div>
         <a id="client-access-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Ir para o portal</a>
       </aside>
@@ -69,12 +70,12 @@ export function loginScreen(app, options = {}) {
   let remembered = {};
   try { remembered = JSON.parse(localStorage.getItem('remembered_login') || '{}'); }
   catch { localStorage.removeItem('remembered_login'); }
-  form.organization.value = String(remembered.organization || '');
+  form.organization.value = '';
   form.login.value = String(remembered.login || '');
   if (options.organization) {
     form.organization.value = String(options.organization).toUpperCase();
     form.organization.readOnly = options.lockOrganization !== false;
-    form.organization.classList.add('is-remembered');
+    form.organization.classList.add('is-fixed');
   }
   const markRemembered = input => {
     const savedValue = String(remembered[input.name] || '');
@@ -82,6 +83,7 @@ export function loginScreen(app, options = {}) {
   };
   markRemembered(form.organization);
   markRemembered(form.login);
+  if (options.organization) form.organization.classList.add('is-fixed');
   form.organization.oninput = event => {
     event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
     markRemembered(event.target);

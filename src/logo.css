@@ -109,6 +109,21 @@
   box-shadow: inset 3px 0 0 #2962ff;
 }
 
+.login-card input.is-fixed:not([type="checkbox"]) {
+  border-color: #a9c3ff;
+  background-color: #eef4ff;
+  color: #17233c;
+  box-shadow: inset 3px 0 0 #2962ff;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.login-card input.is-fixed:not([type="checkbox"]):focus {
+  border-color: #2962ff;
+  background-color: #eef4ff;
+  box-shadow: inset 3px 0 0 #2962ff, 0 0 0 3px rgba(41, 98, 255, 0.1);
+}
+
 .login-card input.is-remembered:not([type="checkbox"]):focus {
   border-color: #2962ff;
   background: #f4f7ff;
