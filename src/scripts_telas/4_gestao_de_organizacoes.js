@@ -57,7 +57,7 @@ export async function organizationsScreen(app) {
     </div>
     <button type="button" id="delete-organization-button" class="danger-button" disabled>Excluir Organização Selecionada</button>
     <p id="deletion-feedback" class="error"></p>
-  </section></div>`, 'Cadastro de Organizações');
+  </section></div>`, 'Gestão de Organizações');
   bindShell();
 
   try {
