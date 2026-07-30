@@ -136,9 +136,10 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
       const frame = new THREE.Mesh(new THREE.BoxGeometry(2.8, 3.2, .45), new THREE.MeshStandardMaterial({ color: 0xf0f3f6, metalness: .38, roughness: .4 }));
       const doorMaterial = organization.status === 'active' ? materials.door.clone() : materials.blocked.clone();
       const door = new THREE.Mesh(new THREE.BoxGeometry(1.65, 2.35, .18), doorMaterial);
-      door.position.set(0, -.35, side > 0 ? -.31 : .31);
+      door.position.set(0, -.35, .31);
       const active = organization.status === 'active';
       const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.45, .86), new THREE.MeshBasicMaterial({
+        side: THREE.DoubleSide,
         map: signTexture(
           active ? organization.name : 'Em construção...',
           active ? 'ENTRADA' : 'AGUARDE NOVIDADES',
@@ -149,7 +150,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
           : ''
         )
       }));
-      sign.position.set(0, 1.75, side > 0 ? -.25 : .25);
+      sign.position.set(0, 1.75, .25);
       if (side < 0) { group.rotation.y = Math.PI / 2; group.position.set(-4.72, 1.65, z); }
       else { group.rotation.y = -Math.PI / 2; group.position.set(4.72, 1.65, z); }
       group.add(frame, door, sign); group.userData = { organization, position: new THREE.Vector3(side * 4.15, 1.7, z) };
