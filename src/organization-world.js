@@ -36,11 +36,12 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.domElement.setAttribute('aria-label', 'Ambiente tridimensional das organizações');
   container.prepend(renderer.domElement);
   const controls = new PointerLockControls(camera, renderer.domElement);
-  const clock = new THREE.Clock();
+  const timer = new THREE.Timer();
+  timer.connect(document);
   const keys = { forward: false, backward: false, left: false, right: false };
   const stores = [];
   let floorId = 1;
@@ -145,6 +146,9 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     }
   }
   const keyState = (event, pressed) => {
+    if (controls.isLocked && ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyE', 'Enter', 'Space'].includes(event.code)) {
+      event.preventDefault();
+    }
     if (['KeyW', 'ArrowUp'].includes(event.code)) keys.forward = pressed;
     if (['KeyS', 'ArrowDown'].includes(event.code)) keys.backward = pressed;
     if (['KeyA', 'ArrowLeft'].includes(event.code)) keys.left = pressed;
@@ -156,8 +160,20 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   document.addEventListener('keydown', onKeyDown);
   document.addEventListener('keyup', onKeyUp);
   start.onclick = () => controls.lock();
-  controls.addEventListener('lock', () => { start.hidden = true; container.focus(); });
-  controls.addEventListener('unlock', () => { if (container.isConnected && !app.querySelector('.login-modal')) start.hidden = false; });
+  renderer.domElement.addEventListener('click', () => { if (!controls.isLocked) controls.lock(); });
+  const stopPageScroll = event => { if (controls.isLocked) event.preventDefault(); };
+  controls.addEventListener('lock', () => {
+    start.hidden = true;
+    container.classList.add('is-playing');
+    container.focus({ preventScroll: true });
+    document.addEventListener('wheel', stopPageScroll, { passive: false });
+  });
+  controls.addEventListener('unlock', () => {
+    container.classList.remove('is-playing');
+    document.removeEventListener('wheel', stopPageScroll);
+    Object.keys(keys).forEach(key => { keys[key] = false; });
+    if (container.isConnected && !app.querySelector('.login-modal')) start.hidden = false;
+  });
   app.querySelectorAll('[data-floor]').forEach(button => { button.onclick = () => renderFloor(Number(button.dataset.floor)); });
   app.querySelectorAll('[data-move]').forEach(button => {
     const direction = Number(button.dataset.move);
@@ -173,13 +189,15 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   }
   const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(container); resize();
 
-  function animate() {
+  function animate(timestamp) {
     if (!container.isConnected) {
       document.removeEventListener('keydown', onKeyDown); document.removeEventListener('keyup', onKeyUp);
-      resizeObserver.disconnect(); controls.unlock(); renderer.dispose(); return;
+      document.removeEventListener('wheel', stopPageScroll);
+      resizeObserver.disconnect(); controls.unlock(); timer.dispose(); renderer.dispose(); return;
     }
     requestAnimationFrame(animate);
-    const delta = Math.min(clock.getDelta(), .05);
+    timer.update(timestamp);
+    const delta = Math.min(timer.getDelta(), .05);
     if (controls.isLocked) {
       const speed = 4.6 * delta;
       if (keys.forward) controls.moveForward(speed);
