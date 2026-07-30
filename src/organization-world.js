@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
-function signTexture(title, subtitle, active) {
+function signTexture(title, subtitle, active, logoUrl = '') {
   const canvas = document.createElement('canvas');
   canvas.width = 512; canvas.height = 180;
   const ctx = canvas.getContext('2d');
@@ -10,10 +10,24 @@ function signTexture(title, subtitle, active) {
   gradient.addColorStop(1, active ? '#a9d7f7' : '#909ca8');
   ctx.fillStyle = gradient; ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.strokeStyle = active ? '#168cff' : '#667686'; ctx.lineWidth = 8; ctx.strokeRect(5, 5, 502, 170);
-  ctx.fillStyle = '#102237'; ctx.textAlign = 'center'; ctx.font = '700 46px Arial'; ctx.fillText(title, 256, 78);
+  ctx.fillStyle = '#102237'; ctx.textAlign = 'center'; ctx.font = '700 40px Arial'; ctx.fillText(title, 256, 78, 450);
   ctx.fillStyle = active ? '#075fa9' : '#4e5b68'; ctx.font = '600 25px Arial'; ctx.fillText(subtitle, 256, 128);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
+  if (active && logoUrl) {
+    const image = new Image();
+    image.onload = () => {
+      ctx.fillStyle = gradient; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#168cff'; ctx.lineWidth = 8; ctx.strokeRect(5, 5, 502, 170);
+      const ratio = Math.min(110 / image.width, 110 / image.height);
+      const width = image.width * ratio; const height = image.height * ratio;
+      ctx.drawImage(image, 22 + (110 - width) / 2, 35 + (110 - height) / 2, width, height);
+      ctx.fillStyle = '#102237'; ctx.textAlign = 'left'; ctx.font = '700 35px Arial'; ctx.fillText(title, 155, 78, 330);
+      ctx.fillStyle = '#075fa9'; ctx.font = '600 23px Arial'; ctx.fillText(subtitle, 155, 126, 330);
+      texture.needsUpdate = true;
+    };
+    image.src = logoUrl;
+  }
   return texture;
 }
 
@@ -119,7 +133,15 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
       const doorMaterial = organization.status === 'active' ? materials.door.clone() : materials.blocked.clone();
       const door = new THREE.Mesh(new THREE.BoxGeometry(1.65, 2.35, .18), doorMaterial);
       door.position.set(0, -.35, side > 0 ? -.31 : .31);
-      const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.45, .86), new THREE.MeshBasicMaterial({ map: signTexture(organization.id, organization.status === 'active' ? 'ENTRADA' : 'EM CONSTRUÇÃO...', organization.status === 'active') }));
+      const active = organization.status === 'active';
+      const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.45, .86), new THREE.MeshBasicMaterial({
+        map: signTexture(
+          active ? organization.name : 'Em construção...',
+          active ? 'ENTRADA' : 'AGUARDE NOVIDADES',
+          active,
+          active ? `${import.meta.env.BASE_URL}imagens/${encodeURIComponent(organization.id)}/logo.png` : ''
+        )
+      }));
       sign.position.set(0, 1.75, side > 0 ? -.25 : .25);
       if (side < 0) { group.rotation.y = Math.PI / 2; group.position.set(-4.72, 1.65, z); }
       else { group.rotation.y = -Math.PI / 2; group.position.set(4.72, 1.65, z); }
@@ -222,7 +244,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     if (!available) nearby = null;
     enterButton.disabled = !(nearby?.organization.status === 'active');
     prompt.textContent = nearby
-      ? nearby.organization.status === 'active' ? `${nearby.organization.id} — pressione E para entrar` : `${nearby.organization.id} — Em construção...`
+      ? nearby.organization.status === 'active' ? `${nearby.organization.name} — pressione E para entrar` : 'Sala em construção...'
       : `Piso ${floorId} — use WASD e o mouse`;
     renderer.render(scene, camera);
   }
