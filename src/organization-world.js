@@ -60,6 +60,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   const stores = [];
   let floorId = 1;
   let nearby = null;
+  let runningTo = null;
 
   scene.add(new THREE.HemisphereLight(0xffffff, 0x7f96aa, 2.7));
   scene.add(new THREE.AmbientLight(0xffffff, 1.15));
@@ -240,6 +241,36 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   });
   const enterButton = app.querySelector('#enter-store');
   enterButton.onclick = enterNearby;
+  const searchForm = app.querySelector('#store-search-form');
+  const searchInput = app.querySelector('#store-search');
+  const searchFeedback = app.querySelector('#store-search-feedback');
+  searchForm.onsubmit = event => {
+    event.preventDefault();
+    const query = searchInput.value.trim().toLocaleLowerCase('pt-BR');
+    const floor = directory.floors.find(item => item.organizations.some(organization => organization.status === 'active' && organization.name.toLocaleLowerCase('pt-BR') === query));
+    const organization = floor?.organizations.find(item => item.status === 'active' && item.name.toLocaleLowerCase('pt-BR') === query);
+    if (!organization) {
+      searchFeedback.textContent = 'Selecione uma loja disponível na lista de sugestões.';
+      searchFeedback.classList.add('is-error');
+      return;
+    }
+    if (floor.id !== floorId) {
+      searchFeedback.textContent = `${organization.name} fica no Piso ${floor.id}. Use a escada para chegar até lá.`;
+      searchFeedback.classList.remove('is-error');
+      return;
+    }
+    const store = stores.find(item => item.userData.organization.id === organization.id);
+    if (!store) return;
+    controls.unlock();
+    start.hidden = true;
+    runningTo = {
+      store: store.userData,
+      destination: new THREE.Vector3(store.userData.position.x > 0 ? 3.15 : -3.15, 1.7, store.userData.position.z)
+    };
+    searchFeedback.textContent = `Correndo até ${organization.name}...`;
+    searchFeedback.classList.remove('is-error');
+    prompt.textContent = `Indo até ${organization.name}...`;
+  };
 
   function resize() {
     const width = container.clientWidth; const height = container.clientHeight;
@@ -256,7 +287,24 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     requestAnimationFrame(animate);
     timer.update(timestamp);
     const delta = Math.min(timer.getDelta(), .05);
-    if (controls.isLocked) {
+    if (runningTo) {
+      const offset = runningTo.destination.clone().sub(camera.position);
+      const remaining = offset.length();
+      if (remaining > .16) {
+        const step = Math.min(remaining, 9.5 * delta);
+        camera.position.addScaledVector(offset.normalize(), step);
+        camera.position.y = 1.7 + Math.sin(performance.now() * .025) * .045;
+        camera.lookAt(runningTo.store.position);
+      } else {
+        camera.position.copy(runningTo.destination);
+        camera.lookAt(runningTo.store.position);
+        nearby = runningTo.store;
+        searchFeedback.textContent = `Você chegou à ${runningTo.store.organization.name}. Clique no ambiente e use Espaço ou Enter para entrar.`;
+        prompt.textContent = `${runningTo.store.organization.name} — Espaço ou Enter`;
+        runningTo = null;
+        start.hidden = false;
+      }
+    } else if (controls.isLocked) {
       const speed = 4.6 * delta;
       if (keys.forward) controls.moveForward(speed);
       if (keys.backward) controls.moveForward(-speed);
