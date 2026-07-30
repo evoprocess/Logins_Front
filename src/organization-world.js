@@ -331,6 +331,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     prompt.textContent = nearby
       ? nearby.organization.status === 'active' ? `${nearby.organization.name} — pressione Espaço ou Enter` : 'Sala em construção...'
       : `Piso ${floorId} — use WASD e o mouse`;
+    if (controls.isLocked) prompt.textContent += ' · Aperte ESC para sair';
     renderer.render(scene, camera);
   }
   renderFloor(1); animate();

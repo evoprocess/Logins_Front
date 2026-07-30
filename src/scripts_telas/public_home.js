@@ -58,8 +58,7 @@ export function publicHomeScreen(app, openLogin = false) {
     searchInput.setAttribute('aria-expanded', 'true');
   };
   const hideOptions = () => { storeOptions.hidden = true; searchInput.setAttribute('aria-expanded', 'false'); };
-  searchInput.oninput = () => showOptions(false);
-  searchInput.onfocus = () => showOptions(false);
+  searchInput.oninput = () => { if (!storeOptions.hidden) showOptions(false); };
   app.querySelector('#toggle-store-options').onclick = () => storeOptions.hidden ? showOptions(true) : hideOptions();
   optionButtons.forEach(option => { option.onclick = () => { searchInput.value = option.dataset.storeOption; hideOptions(); searchInput.focus(); }; });
   page.addEventListener('click', event => { if (!event.target.closest('.store-combobox')) hideOptions(); });
