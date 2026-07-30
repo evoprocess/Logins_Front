@@ -68,6 +68,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   let floorId = 1;
   let nearby = null;
   let runningTo = null;
+  let lockedAtRunDestination = false;
 
   scene.add(new THREE.HemisphereLight(0xffffff, 0x7f96aa, 2.7));
   scene.add(new THREE.AmbientLight(0xffffff, 1.15));
@@ -214,6 +215,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     if (controls.isLocked && ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Space'].includes(event.code)) {
       event.preventDefault();
     }
+    if (lockedAtRunDestination && !['Enter', 'Space'].includes(event.code)) return;
     if (['KeyW', 'ArrowUp'].includes(event.code)) keys.forward = pressed;
     if (['KeyS', 'ArrowDown'].includes(event.code)) keys.backward = pressed;
     if (['KeyA', 'ArrowLeft'].includes(event.code)) keys.left = pressed;
@@ -236,6 +238,8 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     document.addEventListener('wheel', stopPageScroll, { passive: false });
   });
   controls.addEventListener('unlock', () => {
+    lockedAtRunDestination = false;
+    controls.enabled = true;
     container.classList.remove('is-playing');
     document.removeEventListener('wheel', stopPageScroll);
     Object.keys(keys).forEach(key => { keys[key] = false; });
@@ -263,6 +267,9 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     const store = stores.find(item => item.userData.organization.id === organization.id);
     if (!store) return;
     if (!controls.isLocked) controls.lock();
+    lockedAtRunDestination = false;
+    controls.enabled = true;
+    Object.keys(keys).forEach(key => { keys[key] = false; });
     runningTo = {
       store: store.userData,
       destination: new THREE.Vector3(store.userData.position.x > 0 ? .75 : -.75, 1.7, store.userData.position.z)
@@ -300,11 +307,14 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
         camera.lookAt(runningTo.store.position);
         nearby = runningTo.store;
         searchFeedback.textContent = '';
-        prompt.textContent = `${runningTo.store.organization.name} — Espaço ou Enter`;
+        prompt.textContent = 'Espaço / Enter para entrar · Esc para sair da navegação';
         runningTo = null;
+        lockedAtRunDestination = true;
+        controls.enabled = false;
+        Object.keys(keys).forEach(key => { keys[key] = false; });
         start.hidden = true;
       }
-    } else if (controls.isLocked) {
+    } else if (controls.isLocked && !lockedAtRunDestination) {
       const speed = 4.6 * delta;
       if (keys.forward) controls.moveForward(speed);
       if (keys.backward) controls.moveForward(-speed);
