@@ -187,7 +187,8 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     camera.position.set(0, 1.7, arrivalByStairs ? -34 : 4);
     camera.rotation.set(0, arrivalByStairs ? Math.PI : 0, 0);
     stairCooldown = performance.now() + 1400;
-    app.querySelectorAll('[data-floor]').forEach(button => button.classList.toggle('is-active', Number(button.dataset.floor) === id));
+    const floorLabel = app.querySelector('#current-floor-label');
+    if (floorLabel) floorLabel.textContent = `Piso ${id}`;
     prompt.textContent = `Piso ${id} — caminhe até uma porta`;
   }
 
@@ -232,7 +233,6 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     Object.keys(keys).forEach(key => { keys[key] = false; });
     if (container.isConnected && !app.querySelector('.login-modal')) start.hidden = false;
   });
-  app.querySelectorAll('[data-floor]').forEach(button => { button.onclick = () => renderFloor(Number(button.dataset.floor)); });
   app.querySelectorAll('[data-move]').forEach(button => {
     const direction = Number(button.dataset.move);
     const set = active => { keys[direction < 0 ? 'left' : 'right'] = active; };
