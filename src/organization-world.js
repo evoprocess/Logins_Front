@@ -261,11 +261,10 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     }
     const store = stores.find(item => item.userData.organization.id === organization.id);
     if (!store) return;
-    controls.unlock();
-    start.hidden = true;
+    if (!controls.isLocked) controls.lock();
     runningTo = {
       store: store.userData,
-      destination: new THREE.Vector3(store.userData.position.x > 0 ? 3.15 : -3.15, 1.7, store.userData.position.z)
+      destination: new THREE.Vector3(store.userData.position.x > 0 ? .75 : -.75, 1.7, store.userData.position.z)
     };
     searchFeedback.textContent = `Correndo até ${organization.name}...`;
     searchFeedback.classList.remove('is-error');
@@ -299,10 +298,10 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
         camera.position.copy(runningTo.destination);
         camera.lookAt(runningTo.store.position);
         nearby = runningTo.store;
-        searchFeedback.textContent = `Você chegou à ${runningTo.store.organization.name}. Clique no ambiente e use Espaço ou Enter para entrar.`;
+        searchFeedback.textContent = `Você chegou à ${runningTo.store.organization.name}. Use Espaço ou Enter para entrar.`;
         prompt.textContent = `${runningTo.store.organization.name} — Espaço ou Enter`;
         runningTo = null;
-        start.hidden = false;
+        start.hidden = true;
       }
     } else if (controls.isLocked) {
       const speed = 4.6 * delta;
@@ -324,7 +323,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
       const current = camera.position.distanceTo(store.userData.position);
       if (current < distance) { distance = current; nearby = store.userData; }
     });
-    const available = distance < 3.1;
+    const available = distance < 3.8;
     if (!available) nearby = null;
     enterButton.disabled = !(nearby?.organization.status === 'active');
     prompt.textContent = nearby
