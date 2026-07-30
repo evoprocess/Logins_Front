@@ -1,4 +1,4 @@
-import { api, state, shell, bindShell, SYSTEM_NAME, SYSTEM_EMAIL, SYSTEM_URL } from '../main.js';
+import { api, state, shell, bindShell, API_URL, SYSTEM_NAME, SYSTEM_EMAIL, SYSTEM_URL } from '../main.js';
 import '../organizations.css';
 import { bindDocumentValidation } from '../document-validation.js';
 
@@ -31,6 +31,17 @@ export async function organizationsScreen(app) {
       <div class="registration-actions"><button type="button" id="generate-password">Gerar Senha</button><button type="submit" title="Ao cadastrar a organização o acesso será enviado para os e-mails administrativo e de acessos">Cadastrar Organização</button></div></section>
     </fieldset><p id="registration-feedback" class="error"></p>
   </form>
+  <section id="api-integration" class="api-integration" hidden>
+    <div class="integration-heading"><div><span>INTEGRAÇÃO EXTERNA</span><h2>API GateGuard</h2></div><span id="integration-badge" class="badge">Selecione uma organização</span></div>
+    <p>Conecte sistemas externos ao controle terceirizado de login, pagamentos e bloqueios do GateGuard.</p>
+    <label>Organização<select id="integration-organization"><option value="">Carregando organizações...</option></select></label>
+    <div id="integration-details" hidden>
+      <div class="integration-endpoint"><small>Endpoint de autenticação</small><code>POST ${esc(API_URL)}/api/integrations/authenticate</code></div>
+      <div class="integration-actions"><button type="button" id="generate-integration-key">Gerar chave</button><button type="button" id="revoke-integration-key" class="danger-button" hidden>Revogar integração</button></div>
+      <div id="integration-secret" hidden><strong>Copie a chave agora. Ela será exibida somente uma vez.</strong><div><code></code><button type="button" id="copy-integration-key">Copiar</button></div></div>
+      <p id="integration-feedback"></p>
+    </div>
+  </section>
   <section id="organization-danger" class="organization-danger" hidden>
     <h2>Excluir organização</h2>
     <p><strong>Atenção:</strong> esta ação é irreversível. O cadastro, os acessos e o projeto Firebase da organização serão removidos.</p>
@@ -65,6 +76,67 @@ export async function organizationsScreen(app) {
     app.querySelector('#generate-password').onclick = async () => { form.temporaryPassword.value = (await api('/api/organization-registration/password')).password; };
     const deleteSelect = app.querySelector('#delete-organization');
     const removable = organizationData.organizations.filter(item => item.id !== 'ORG_0000');
+    const integrationSection = app.querySelector('#api-integration');
+    const integrationSelect = app.querySelector('#integration-organization');
+    const integrationDetails = app.querySelector('#integration-details');
+    const integrationBadge = app.querySelector('#integration-badge');
+    const integrationFeedback = app.querySelector('#integration-feedback');
+    const integrationSecret = app.querySelector('#integration-secret');
+    const generateKey = app.querySelector('#generate-integration-key');
+    const revokeKey = app.querySelector('#revoke-integration-key');
+    integrationSelect.innerHTML = '<option value="">Selecione uma organização</option>' + removable.map(item => `<option value="${esc(item.id)}">${esc(item.id)} — ${esc(item.name)}</option>`).join('');
+    integrationSection.hidden = false;
+    const loadIntegration = async () => {
+      const organization = integrationSelect.value;
+      integrationDetails.hidden = !organization;
+      integrationSecret.hidden = true;
+      integrationFeedback.textContent = '';
+      if (!organization) { integrationBadge.textContent = 'Selecione uma organização'; return; }
+      integrationBadge.textContent = 'Consultando...';
+      try {
+        const data = await api(`/api/organizations/${encodeURIComponent(organization)}/integration`);
+        integrationBadge.textContent = data.enabled ? 'Integração ativa' : 'Integração inativa';
+        integrationBadge.classList.toggle('is-inactive', !data.enabled);
+        generateKey.textContent = data.enabled ? 'Rotacionar chave' : 'Gerar chave';
+        revokeKey.hidden = !data.enabled;
+      } catch (error) {
+        integrationBadge.textContent = 'Falha na consulta';
+        integrationFeedback.textContent = error.message;
+        integrationFeedback.className = 'error';
+      }
+    };
+    integrationSelect.onchange = loadIntegration;
+    generateKey.onclick = async () => {
+      generateKey.disabled = true;
+      integrationFeedback.textContent = 'Gerando credencial segura...';
+      try {
+        const data = await api(`/api/organizations/${encodeURIComponent(integrationSelect.value)}/integration/key`, { method: 'POST' });
+        integrationSecret.querySelector('code').textContent = data.apiKey;
+        integrationFeedback.textContent = 'Chave criada. Configure-a somente no servidor do sistema externo.';
+        integrationFeedback.className = 'notice';
+        await loadIntegration();
+        integrationSecret.hidden = false;
+      } catch (error) {
+        integrationFeedback.textContent = error.message;
+        integrationFeedback.className = 'error';
+      } finally { generateKey.disabled = false; }
+    };
+    app.querySelector('#copy-integration-key').onclick = async () => {
+      await navigator.clipboard.writeText(integrationSecret.querySelector('code').textContent);
+      app.querySelector('#copy-integration-key').textContent = 'Copiada';
+    };
+    revokeKey.onclick = async () => {
+      if (!confirm('Revogar a integração desta organização? O sistema externo perderá o acesso imediatamente.')) return;
+      try {
+        await api(`/api/organizations/${encodeURIComponent(integrationSelect.value)}/integration/key`, { method: 'DELETE' });
+        integrationFeedback.textContent = 'Integração revogada.';
+        integrationFeedback.className = 'notice';
+        await loadIntegration();
+      } catch (error) {
+        integrationFeedback.textContent = error.message;
+        integrationFeedback.className = 'error';
+      }
+    };
     deleteSelect.innerHTML = '<option value="">Selecione uma organização</option>' + removable.map(item => `<option value="${esc(item.id)}">${esc(item.id)} — ${esc(item.name)}</option>`).join('');
     app.querySelector('#organization-danger').hidden = false;
     const deletePassword = app.querySelector('#delete-password');
