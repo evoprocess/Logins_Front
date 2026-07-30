@@ -129,14 +129,36 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     }
     const organizations = directory.floors.find(floor => floor.id === id)?.organizations || [];
     organizations.forEach((organization, index) => {
-      const side = index % 2 === 0 ? -1 : 1;
-      const row = Math.floor(index / 2);
-      const z = -5 - row * 11;
+      let side;
+      let z;
+      if (id === 1 && organization.id === 'ORG_0000') {
+        side = -1; z = -5;
+      } else if (id === 1 && organization.id === 'ORG_0001') {
+        side = -1; z = -13;
+      } else if (id === 1) {
+        const slot = index - 2;
+        side = slot % 2 === 0 ? 1 : -1;
+        z = -13 - Math.floor((slot + 1) / 2) * 8;
+      } else {
+        side = index % 2 === 0 ? -1 : 1;
+        z = -5 - Math.floor(index / 2) * 11;
+      }
       const group = new THREE.Group();
-      const frame = new THREE.Mesh(new THREE.BoxGeometry(2.8, 3.2, .45), new THREE.MeshStandardMaterial({ color: 0xf0f3f6, metalness: .38, roughness: .4 }));
+      const gateGuardStore = organization.id === 'ORG_0000';
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(gateGuardStore ? 3.55 : 2.8, 3.2, .45), new THREE.MeshStandardMaterial({ color: 0xf0f3f6, metalness: .38, roughness: .4 }));
       const doorMaterial = organization.status === 'active' ? materials.door.clone() : materials.blocked.clone();
-      const door = new THREE.Mesh(new THREE.BoxGeometry(1.65, 2.35, .18), doorMaterial);
-      door.position.set(0, -.35, .31);
+      const doors = [];
+      if (gateGuardStore) {
+        [-.44, .44].forEach(x => {
+          const door = new THREE.Mesh(new THREE.BoxGeometry(.82, 2.35, .18), doorMaterial.clone());
+          door.position.set(x, -.35, .31);
+          doors.push(door);
+        });
+      } else {
+        const door = new THREE.Mesh(new THREE.BoxGeometry(1.65, 2.35, .18), doorMaterial);
+        door.position.set(0, -.35, .31);
+        doors.push(door);
+      }
       const active = organization.status === 'active';
       const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.45, .86), new THREE.MeshBasicMaterial({
         side: THREE.DoubleSide,
@@ -153,7 +175,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
       sign.position.set(0, 1.75, .25);
       if (side < 0) { group.rotation.y = Math.PI / 2; group.position.set(-4.72, 1.65, z); }
       else { group.rotation.y = -Math.PI / 2; group.position.set(4.72, 1.65, z); }
-      group.add(frame, door, sign); group.userData = { organization, position: new THREE.Vector3(side * 4.15, 1.7, z) };
+      group.add(frame, ...doors, sign); group.userData = { organization, position: new THREE.Vector3(side * 4.15, 1.7, z) };
       group.traverse(item => { item.castShadow = true; item.receiveShadow = true; });
       shops.add(group); stores.push(group);
       if (organization.status === 'active') {
