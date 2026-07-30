@@ -38,8 +38,15 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   const start = document.createElement('button');
   start.className = 'fps-start';
   start.innerHTML = '<b>Entrar no ambiente 3D</b><span>Clique para controlar a câmera com o mouse</span>';
+  const enterButton = document.createElement('button');
+  enterButton.id = 'enter-store';
+  enterButton.className = 'fps-enter-store';
+  enterButton.type = 'button';
+  enterButton.innerHTML = '<span>⌾</span><b>ENTRAR</b><small>Espaço ou Enter</small>';
+  enterButton.hidden = true;
+  enterButton.disabled = true;
   container.innerHTML = '';
-  container.append(start, prompt);
+  container.append(start, prompt, enterButton);
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xdce8f2);
@@ -234,12 +241,6 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     Object.keys(keys).forEach(key => { keys[key] = false; });
     if (container.isConnected && !app.querySelector('.login-modal')) start.hidden = false;
   });
-  app.querySelectorAll('[data-move]').forEach(button => {
-    const direction = Number(button.dataset.move);
-    const set = active => { keys[direction < 0 ? 'left' : 'right'] = active; };
-    button.onpointerdown = () => set(true); button.onpointerup = () => set(false); button.onpointerleave = () => set(false);
-  });
-  const enterButton = app.querySelector('#enter-store');
   enterButton.onclick = enterNearby;
   const searchForm = app.querySelector('#store-search-form');
   const searchInput = app.querySelector('#store-search');
@@ -326,6 +327,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     const available = distance < 3.8;
     if (!available) nearby = null;
     enterButton.disabled = !(nearby?.organization.status === 'active');
+    enterButton.hidden = enterButton.disabled;
     prompt.textContent = nearby
       ? nearby.organization.status === 'active' ? `${nearby.organization.name} — pressione Espaço ou Enter` : 'Sala em construção...'
       : `Piso ${floorId} — use WASD e o mouse`;

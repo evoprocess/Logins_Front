@@ -23,7 +23,8 @@ export function publicHomeScreen(app, openLogin = false) {
           <div class="locator-heading"><div><span class="public-eyebrow">AMBIENTE INTERATIVO</span><h2>Localizar Organização</h2><p>Ande pelo corredor, aproxime-se de uma sala ativa e entre para acessar sua conta.</p></div><div class="floor-indicator"><small>PISO ATUAL</small><strong id="current-floor-label">Piso 1</strong><span>Use a escada para trocar</span></div></div>
           <form id="store-search-form" class="store-search" autocomplete="off"><label for="store-search">Pesquisar Organização</label><div><select id="store-search" required><option value="">Selecione uma organização</option>${directory.floors.flatMap(floor => floor.organizations).filter(organization => organization.status === 'active').map(organization => `<option value="${organization.name}">${organization.name}</option>`).join('')}</select><button type="submit">Ir correndo</button></div><small id="store-search-feedback">Abra a lista, selecione uma organização e corra até a fachada.</small></form>
           <div class="locator-game" tabindex="0" aria-label="Use as setas ou as teclas A e D para caminhar pelas salas."><div class="game-ceiling"><span>PISO <b id="floor-number">1</b></span><i></i><span>GATEGUARD DIRECTORY</span></div><div class="game-world"><div id="store-row" class="store-row"></div><div class="game-floor-lines"></div><div id="game-avatar" class="game-avatar"><span class="avatar-head"></span><span class="avatar-body"></span><span class="avatar-legs"></span></div></div><div id="game-prompt" class="game-prompt">Use ← → ou A D para caminhar</div></div>
-          <div class="game-controls"><button data-move="-1" aria-label="Andar para esquerda">←</button><button id="enter-store" disabled>Entrar</button><button data-move="1" aria-label="Andar para direita">→</button></div><p class="game-help">Movimento: <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> ou setas. Entre com <kbd>Espaço</kbd> ou <kbd>Enter</kbd>. Saia com <kbd>Esc</kbd>.</p>
+          <button type="button" id="movement-legend-button" class="movement-legend-button">LEGENDA DE MOVIMENTOS</button>
+          <div id="movement-legend-popup" class="movement-legend-popup" hidden><div><button type="button" id="close-movement-legend" aria-label="Fechar legenda">&times;</button><span>CONTROLES DO AMBIENTE</span><h3>Legenda de movimentos</h3><ul><li><kbd>W A S D</kbd><span>Caminhar pelo ambiente</span></li><li><kbd>↑ ↓ ← →</kbd><span>Movimentação alternativa</span></li><li><kbd>Mouse</kbd><span>Controlar a câmera</span></li><li><kbd>Espaço / Enter</kbd><span>Entrar na organização</span></li><li><kbd>Esc</kbd><span>Liberar o cursor</span></li></ul></div></div>
         </section>
 
         <section id="cadastre-se" class="signup-section public-screen" data-public-screen>
@@ -44,6 +45,10 @@ export function publicHomeScreen(app, openLogin = false) {
     tabs.forEach(tab => { const active = tab.dataset.scroll === visible.target.id; tab.classList.toggle('is-active', active); tab.setAttribute('aria-current', active ? 'page' : 'false'); });
   }, { root: page, threshold: [.55, .75] });
   app.querySelectorAll('[data-public-screen]').forEach(section => observer.observe(section));
+  const legendPopup = app.querySelector('#movement-legend-popup');
+  app.querySelector('#movement-legend-button').onclick = () => { legendPopup.hidden = false; };
+  app.querySelector('#close-movement-legend').onclick = () => { legendPopup.hidden = true; };
+  legendPopup.onclick = event => { if (event.target === legendPopup) legendPopup.hidden = true; };
   import('../organization-world.js').then(({ bindFirstPersonDirectory }) => {
     if (app.querySelector('.locator-game')) bindFirstPersonDirectory(app, open, directory);
   }).catch(() => {
