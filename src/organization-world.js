@@ -143,7 +143,10 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
           active ? organization.name : 'Em construção...',
           active ? 'ENTRADA' : 'AGUARDE NOVIDADES',
           active,
-          active ? `${import.meta.env.BASE_URL}imagens/${encodeURIComponent(organization.id)}/logo.png` : ''
+          active ? organization.id === 'ORG_0000'
+            ? `${import.meta.env.BASE_URL}imagens_pub/gateguard_logo.png`
+            : `${import.meta.env.BASE_URL}imagens/${encodeURIComponent(organization.id)}/logo.png`
+          : ''
         )
       }));
       sign.position.set(0, 1.75, side > 0 ? -.25 : .25);

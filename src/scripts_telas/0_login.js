@@ -19,7 +19,7 @@ export function loginScreen(app, options = {}) {
       <button class="login-close" type="button" data-close-login aria-label="Fechar login">&times;</button>
       <div class="brand"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"></div>
       <div class="login-heading"><span>ÁREA DA ORGANIZAÇÃO</span><h2 id="login-title">Acesso à plataforma</h2><p>Login destinado à organização para administrar sua conta e os pagamentos do GateGuard.</p></div>
-      ${options.organizationName ? `<div class="login-store"><img src="${ORGANIZATION_IMAGES_URL}/${encodeURIComponent(options.organization)}/logo.png" alt=""><div><small>Você está entrando em</small><strong>${esc(options.organizationName)}</strong></div></div>` : ''}
+      ${options.organizationName ? `<div class="login-store"><img src="${options.organization === 'ORG_0000' ? `${PUBLIC_IMAGES_URL}/gateguard_logo.png` : `${ORGANIZATION_IMAGES_URL}/${encodeURIComponent(options.organization)}/logo.png`}" alt=""><div><small>Você está entrando em</small><strong>${esc(options.organizationName)}</strong></div></div>` : ''}
       <aside class="client-access" id="client-access">
         <div><span>VOCÊ É CLIENTE?</span><strong id="client-organization-name">Acesse pelo site da sua organização</strong><small id="client-access-message">Informe a organização para localizar o portal correto.</small></div>
         <a id="client-access-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Ir para o portal</a>
