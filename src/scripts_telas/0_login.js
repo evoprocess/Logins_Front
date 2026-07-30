@@ -1,6 +1,6 @@
 import { API_URL, PUBLIC_IMAGES_URL, state, navigate } from '../main.js';
 
-export function loginScreen(app) {
+export function loginScreen(app, options = {}) {
   const modal = document.createElement('div');
   modal.className = 'login-modal';
   modal.setAttribute('role', 'dialog');
@@ -43,6 +43,11 @@ export function loginScreen(app) {
   catch { localStorage.removeItem('remembered_login'); }
   form.organization.value = String(remembered.organization || '');
   form.login.value = String(remembered.login || '');
+  if (options.organization) {
+    form.organization.value = String(options.organization).toUpperCase();
+    form.organization.readOnly = options.lockOrganization !== false;
+    form.organization.classList.add('is-remembered');
+  }
   const markRemembered = input => {
     const savedValue = String(remembered[input.name] || '');
     input.classList.toggle('is-remembered', Boolean(savedValue) && input.value === savedValue);
