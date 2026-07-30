@@ -21,7 +21,7 @@ export function publicHomeScreen(app, openLogin = false) {
 
         <section id="localizar-organizacao" class="flow-section locator-section public-screen" data-public-screen>
           <div class="locator-heading"><div><span class="public-eyebrow">AMBIENTE INTERATIVO</span><h2>Localizar Organização</h2><p>Ande pelo corredor, aproxime-se de uma sala ativa e entre para acessar sua conta.</p></div><div class="locator-tools"><div class="floor-indicator"><small>PISO ATUAL</small><strong id="current-floor-label">Piso 1</strong><span>Use a escada para trocar</span></div><button type="button" id="movement-legend-button" class="movement-legend-button"><small>AJUDA</small><strong>Legenda de Movimentos</strong><span>Consultar controles</span></button></div></div>
-          <form id="store-search-form" class="store-search" autocomplete="off"><label for="store-search">Pesquisar Organização</label><div><div class="store-combobox"><input id="store-search" placeholder="Digite ou selecione uma organização" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="store-options"><button type="button" id="toggle-store-options" aria-label="Exibir todas as organizações">⌄</button><div id="store-options" class="store-options" role="listbox" hidden>${directory.floors.flatMap(floor => floor.organizations).filter(organization => organization.status === 'active').map(organization => `<button type="button" role="option" data-store-option="${organization.name}">${organization.name}</button>`).join('')}</div></div><button type="submit">Ir correndo</button></div><span id="store-search-feedback" class="sr-only" aria-live="polite"></span></form>
+          <form id="store-search-form" class="store-search" autocomplete="off"><label for="store-search">Pesquisar Organização</label><div><div class="store-combobox"><input id="store-search" placeholder="Ex.: GateGuard ou lojasite" role="combobox" aria-autocomplete="both" aria-expanded="false" aria-controls="store-options"><button type="button" id="toggle-store-options" aria-label="Exibir todas as organizações">⌄</button><div id="store-options" class="store-options" role="listbox" hidden>${directory.floors.flatMap(floor => floor.organizations).filter(organization => organization.status === 'active').map(organization => `<button type="button" role="option" data-store-option="${organization.name}">${organization.name}</button>`).join('')}</div></div><button type="submit">Ir correndo</button></div><span id="store-search-feedback" class="sr-only" aria-live="polite"></span></form>
           <div class="locator-game" tabindex="0" aria-label="Use as setas ou as teclas A e D para caminhar pelas salas."><div class="game-ceiling"><span>PISO <b id="floor-number">1</b></span><i></i><span>GATEGUARD DIRECTORY</span></div><div class="game-world"><div id="store-row" class="store-row"></div><div class="game-floor-lines"></div><div id="game-avatar" class="game-avatar"><span class="avatar-head"></span><span class="avatar-body"></span><span class="avatar-legs"></span></div></div><div id="game-prompt" class="game-prompt">Use ← → ou A D para caminhar</div></div>
           <div id="movement-legend-popup" class="movement-legend-popup" hidden><div><button type="button" id="close-movement-legend" aria-label="Fechar legenda">&times;</button><span>CONTROLES DO AMBIENTE</span><h3>Legenda de movimentos</h3><ul><li><kbd>W A S D</kbd><span>Caminhar pelo ambiente</span></li><li><kbd>↑ ↓ ← →</kbd><span>Movimentação alternativa</span></li><li><kbd>Mouse</kbd><span>Controlar a câmera</span></li><li><kbd>Espaço / Enter</kbd><span>Entrar na organização</span></li><li><kbd>Esc</kbd><span>Liberar o cursor</span></li></ul></div></div>
         </section>
@@ -58,7 +58,17 @@ export function publicHomeScreen(app, openLogin = false) {
     searchInput.setAttribute('aria-expanded', 'true');
   };
   const hideOptions = () => { storeOptions.hidden = true; searchInput.setAttribute('aria-expanded', 'false'); };
-  searchInput.oninput = () => { if (!storeOptions.hidden) showOptions(false); };
+  searchInput.oninput = event => {
+    const typed = searchInput.value;
+    if (event.inputType?.startsWith('insert') && typed) {
+      const match = optionButtons.map(option => option.dataset.storeOption).find(name => name.toLocaleLowerCase('pt-BR').startsWith(typed.toLocaleLowerCase('pt-BR')));
+      if (match && match.length > typed.length) {
+        searchInput.value = match;
+        searchInput.setSelectionRange(typed.length, match.length);
+      }
+    }
+    if (!storeOptions.hidden) showOptions(false);
+  };
   app.querySelector('#toggle-store-options').onclick = () => storeOptions.hidden ? showOptions(true) : hideOptions();
   optionButtons.forEach(option => { option.onclick = () => { searchInput.value = option.dataset.storeOption; hideOptions(); searchInput.focus(); }; });
   page.addEventListener('click', event => { if (!event.target.closest('.store-combobox')) hideOptions(); });

@@ -329,9 +329,10 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     enterButton.disabled = !(nearby?.organization.status === 'active');
     enterButton.hidden = enterButton.disabled;
     prompt.textContent = nearby
-      ? nearby.organization.status === 'active' ? `${nearby.organization.name} — pressione Espaço ou Enter` : 'Sala em construção...'
-      : `Piso ${floorId} — use WASD e o mouse`;
-    if (controls.isLocked) prompt.textContent += ' · Aperte ESC para sair';
+      ? nearby.organization.status === 'active'
+        ? 'Espaço / Enter para entrar · Esc para sair da navegação'
+        : 'Sala em construção · Esc para sair da navegação'
+      : `Piso ${floorId} — use WASD e o mouse${controls.isLocked ? ' · Aperte ESC para sair' : ''}`;
     renderer.render(scene, camera);
   }
   renderFloor(1); animate();
