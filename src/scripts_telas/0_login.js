@@ -1,4 +1,4 @@
-import { API_URL, state, navigate } from '../main.js';
+import { API_URL, PUBLIC_IMAGES_URL, state, navigate } from '../main.js';
 
 export function loginScreen(app) {
   const modal = document.createElement('div');
@@ -10,7 +10,7 @@ export function loginScreen(app) {
     <div class="login-backdrop" data-close-login></div>
     <section class="login-card">
       <button class="login-close" type="button" data-close-login aria-label="Fechar login">&times;</button>
-      <div class="brand"><img src="./imagens/gateguard_logo.png" alt="GateGuard"></div>
+      <div class="brand"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"></div>
       <div class="login-heading"><span>ÁREA SEGURA</span><h2 id="login-title">Acesse sua conta</h2><p>Entre com os dados fornecidos pela sua organização.</p></div>
       <form id="login-form">
         <label>ORGANIZAÇÃO<input name="organization" placeholder="ORG_XXXX" required></label>

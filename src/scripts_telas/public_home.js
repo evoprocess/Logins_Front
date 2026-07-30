@@ -1,12 +1,12 @@
 import { loginScreen } from './0_login.js';
-import { SYSTEM_EMAIL } from '../main.js';
+import { PUBLIC_IMAGES_URL, SYSTEM_EMAIL } from '../main.js';
 
 export function publicHomeScreen(app, openLogin = false) {
   const contactLink = SYSTEM_EMAIL ? `mailto:${encodeURIComponent(SYSTEM_EMAIL)}?subject=Quero cadastrar minha organização no GateGuard` : '#';
   app.innerHTML = `
     <div class="public-page">
       <header class="public-header">
-        <a class="public-brand" href="#" aria-label="GateGuard - início"><img src="./imagens/gateguard_logo.png" alt="GateGuard"><strong>GateGuard</strong></a>
+        <a class="public-brand" href="#" aria-label="GateGuard - início"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"><strong>GateGuard</strong></a>
         <nav aria-label="Navegação principal">
           <a href="#como-funciona">Como funciona</a><a href="#recursos">Para você</a><a href="#cadastre-se">Para organizações</a>
           <button class="button button-secondary" data-login>Entrar</button>
@@ -58,8 +58,8 @@ export function publicHomeScreen(app, openLogin = false) {
         </section>
       </main>
       <footer>
-        <div class="footer-product"><img src="./imagens/gateguard_logo.png" alt="GateGuard"><span>© ${new Date().getFullYear()} GateGuard<br><small>Sistema de Acessos e Pagamentos</small></span></div>
-        <div class="footer-developer"><span>Desenvolvido por</span><img src="./imagens/logo_dev.png" alt="Logo do desenvolvedor"></div>
+        <div class="footer-product"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"><span>© ${new Date().getFullYear()} GateGuard<br><small>Sistema de Acessos e Pagamentos</small></span></div>
+        <div class="footer-developer"><span>Desenvolvido por</span><img src="${PUBLIC_IMAGES_URL}/logo_dev.png" alt="Logo do desenvolvedor"></div>
       </footer>
     </div>`;
   const open = () => { if (!app.querySelector('.login-modal')) loginScreen(app); };
