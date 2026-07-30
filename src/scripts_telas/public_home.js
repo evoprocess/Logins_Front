@@ -43,7 +43,12 @@ export function publicHomeScreen(app, openLogin = false) {
     tabs.forEach(tab => { const active = tab.dataset.scroll === visible.target.id; tab.classList.toggle('is-active', active); tab.setAttribute('aria-current', active ? 'page' : 'false'); });
   }, { root: page, threshold: [.55, .75] });
   app.querySelectorAll('[data-public-screen]').forEach(section => observer.observe(section));
-  bindOrganizationGame(app, open);
+  import('../organization-world.js').then(({ bindFirstPersonDirectory }) => {
+    if (app.querySelector('.locator-game')) bindFirstPersonDirectory(app, open, directory);
+  }).catch(() => {
+    const prompt = app.querySelector('#game-prompt');
+    if (prompt) prompt.textContent = 'O ambiente 3D não pôde ser iniciado neste dispositivo.';
+  });
   if (openLogin) open();
 }
 
