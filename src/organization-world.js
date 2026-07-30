@@ -298,7 +298,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
         camera.position.copy(runningTo.destination);
         camera.lookAt(runningTo.store.position);
         nearby = runningTo.store;
-        searchFeedback.textContent = `Você chegou à ${runningTo.store.organization.name}. Use Espaço ou Enter para entrar.`;
+        searchFeedback.textContent = '';
         prompt.textContent = `${runningTo.store.organization.name} — Espaço ou Enter`;
         runningTo = null;
         start.hidden = true;
