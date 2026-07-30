@@ -37,12 +37,13 @@ export function loginScreen(app, options = {}) {
   app.appendChild(modal);
 
   const form = modal.querySelector('#login-form');
-  const close = () => {
+  const close = (reason = 'close') => {
     document.removeEventListener('keydown', onKeydown);
     modal.remove();
+    options.onClose?.({ reason });
   };
-  const onKeydown = event => { if (event.key === 'Escape') close(); };
-  modal.querySelectorAll('[data-close-login]').forEach(element => { element.onclick = close; });
+  const onKeydown = event => { if (event.key === 'Escape') close('escape'); };
+  modal.querySelectorAll('[data-close-login]').forEach(element => { element.onclick = () => close('close'); });
   document.addEventListener('keydown', onKeydown);
 
   let remembered = {};
