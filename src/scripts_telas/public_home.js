@@ -32,7 +32,7 @@ export function publicHomeScreen(app, openLogin = false) {
         </section>
       </main>
     </div>`;
-  const open = (organization, organizationName, onClose) => { if (!app.querySelector('.login-modal')) loginScreen(app, typeof organization === 'string' ? { organization, organizationName, lockOrganization: true, onClose } : {}); };
+  const open = (organization, organizationName, organizationUrl, onClose) => { if (!app.querySelector('.login-modal')) loginScreen(app, typeof organization === 'string' ? { organization, organizationName, organizationUrl, lockOrganization: true, onClose } : {}); };
   app.querySelectorAll('[data-login]').forEach(button => { button.onclick = () => open(); });
   const page = app.querySelector('.public-page');
   const tabs = [...app.querySelectorAll('.nav-tab')];

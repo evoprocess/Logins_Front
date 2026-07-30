@@ -168,7 +168,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   function enterNearby(target = nearby) {
     if (target?.organization.status === 'active') {
       controls.unlock();
-      openLogin(target.organization.id, target.organization.name, ({ reason } = {}) => {
+      openLogin(target.organization.id, target.organization.name, target.organization.publicUrl, ({ reason } = {}) => {
         if (!container.isConnected) return;
         if (reason === 'escape') start.hidden = false;
         else controls.lock();

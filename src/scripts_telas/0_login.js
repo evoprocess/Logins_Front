@@ -1,4 +1,5 @@
 import { API_URL, ORGANIZATION_IMAGES_URL, PUBLIC_IMAGES_URL, state, navigate } from '../main.js';
+import publicDirectory from '../organizacoes_publicas.json';
 
 const esc = value => {
   const element = document.createElement('span');
@@ -17,8 +18,12 @@ export function loginScreen(app, options = {}) {
     <section class="login-card">
       <button class="login-close" type="button" data-close-login aria-label="Fechar login">&times;</button>
       <div class="brand"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"></div>
-      <div class="login-heading"><span>ÁREA SEGURA</span><h2 id="login-title">Acesse sua conta</h2><p>Entre com os dados fornecidos pela sua organização.</p></div>
+      <div class="login-heading"><span>ÁREA DA ORGANIZAÇÃO</span><h2 id="login-title">Acesso à plataforma</h2><p>Login destinado à organização para administrar sua conta e os pagamentos do GateGuard.</p></div>
       ${options.organizationName ? `<div class="login-store"><img src="${ORGANIZATION_IMAGES_URL}/${encodeURIComponent(options.organization)}/logo.png" alt=""><div><small>Você está entrando em</small><strong>${esc(options.organizationName)}</strong></div></div>` : ''}
+      <aside class="client-access" id="client-access">
+        <div><span>VOCÊ É CLIENTE?</span><strong id="client-organization-name">Acesse pelo site da sua organização</strong><small id="client-access-message">Informe a organização para localizar o portal correto.</small></div>
+        <a id="client-access-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Ir para o portal</a>
+      </aside>
       <form id="login-form">
         <label>ORGANIZAÇÃO<input name="organization" placeholder="ORG_XXXX" required></label>
         <label>LOGIN<input name="login" placeholder="Digite seu login" required></label>
@@ -37,6 +42,21 @@ export function loginScreen(app, options = {}) {
   app.appendChild(modal);
 
   const form = modal.querySelector('#login-form');
+  const publicOrganizations = publicDirectory.floors.flatMap(floor => floor.organizations);
+  const synchronizeClientAccess = () => {
+    const organization = String(form.organization.value || '').toUpperCase();
+    const publicOrganization = publicOrganizations.find(item => item.id === organization);
+    const name = options.organizationName || publicOrganization?.name;
+    const url = options.organizationUrl || publicOrganization?.publicUrl;
+    const link = modal.querySelector('#client-access-link');
+    modal.querySelector('#client-access').hidden = organization === 'ORG_0000';
+    modal.querySelector('#client-organization-name').textContent = name && publicOrganization?.status !== 'construction' ? name : 'Acesse pelo site da sua organização';
+    modal.querySelector('#client-access-message').textContent = url
+      ? 'Clientes finais entram e consultam seus pagamentos diretamente no portal da organização.'
+      : organization ? 'O link público ainda não foi configurado. Solicite o endereço à sua organização.' : 'Informe a organização para localizar o portal correto.';
+    link.hidden = !url;
+    if (url) link.href = url;
+  };
   const close = (reason = 'close') => {
     document.removeEventListener('keydown', onKeydown);
     modal.remove();
@@ -65,6 +85,7 @@ export function loginScreen(app, options = {}) {
   form.organization.oninput = event => {
     event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
     markRemembered(event.target);
+    synchronizeClientAccess();
   };
   form.login.oninput = event => markRemembered(event.target);
   modal.querySelector('#show').onchange = event => { form.password.type = event.target.checked ? 'text' : 'password'; };
@@ -104,5 +125,6 @@ export function loginScreen(app, options = {}) {
       status.textContent = '';
     }
   };
+  synchronizeClientAccess();
   setTimeout(() => form.organization.focus(), 0);
 }
