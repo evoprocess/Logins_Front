@@ -1,5 +1,6 @@
 import { api, state, shell, bindShell, API_URL, SYSTEM_NAME, SYSTEM_EMAIL, SYSTEM_URL } from '../main.js';
 import '../organizations.css';
+import '../integration-key-preview.css';
 import { bindDocumentValidation } from '../document-validation.js';
 import publicDirectory from '../organizacoes_publicas.json';
 
@@ -42,6 +43,7 @@ export async function organizationsScreen(app) {
     <label>Organização<select id="integration-organization"><option value="">Carregando organizações...</option></select></label>
     <div id="integration-details" hidden>
       <div class="integration-endpoint"><small>Endpoint de autenticação</small><code>POST ${esc(API_URL)}/api/integrations/authenticate</code></div>
+      <div id="integration-key-preview" class="integration-key-preview" hidden><small>Chave cadastrada</small><code><span>gg_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</span><strong></strong></code><small>Compare os quatro últimos caracteres com a credencial configurada no backend do lojista.</small></div>
       <div class="integration-actions"><button type="button" id="generate-integration-key">Gerar chave</button><button type="button" id="revoke-integration-key" class="danger-button" hidden>Revogar integração</button></div>
       <div id="integration-secret" hidden><strong>Copie a chave agora. Ela será exibida somente uma vez.</strong><div><code></code><button type="button" id="copy-integration-key">Copiar</button></div></div>
       <p id="integration-feedback"></p>
@@ -87,6 +89,7 @@ export async function organizationsScreen(app) {
     const integrationBadge = app.querySelector('#integration-badge');
     const integrationFeedback = app.querySelector('#integration-feedback');
     const integrationSecret = app.querySelector('#integration-secret');
+    const integrationKeyPreview = app.querySelector('#integration-key-preview');
     const generateKey = app.querySelector('#generate-integration-key');
     const revokeKey = app.querySelector('#revoke-integration-key');
     integrationSelect.innerHTML = '<option value="">Selecione uma organização</option>' + removable.map(item => `<option value="${esc(item.id)}">${esc(item.id)} — ${esc(publicOrganizationNames.get(item.id) || item.name || item.id)}</option>`).join('');
@@ -104,7 +107,10 @@ export async function organizationsScreen(app) {
         integrationBadge.classList.toggle('is-inactive', !data.enabled);
         generateKey.textContent = data.enabled ? 'Rotacionar chave' : 'Gerar chave';
         revokeKey.hidden = !data.enabled;
+        integrationKeyPreview.hidden = !(data.enabled && data.keySuffix);
+        integrationKeyPreview.querySelector('strong').textContent = data.keySuffix || '';
       } catch (error) {
+        integrationKeyPreview.hidden = true;
         integrationBadge.textContent = 'Falha na consulta';
         integrationFeedback.textContent = error.message;
         integrationFeedback.className = 'error';

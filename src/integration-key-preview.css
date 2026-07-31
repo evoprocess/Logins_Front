@@ -1,0 +1,27 @@
+.integration-key-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 14px;
+  padding: 15px;
+  border: 1px solid #d7dce3;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.integration-key-preview small {
+  color: #667085;
+}
+
+.integration-key-preview code {
+  overflow-wrap: anywhere;
+}
+
+.integration-key-preview code span {
+  color: #98a2b3;
+}
+
+.integration-key-preview code strong {
+  color: #101828;
+  font-weight: 900;
+}
