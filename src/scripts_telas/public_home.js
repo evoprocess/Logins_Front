@@ -1,6 +1,9 @@
 import { loginScreen } from './0_login.js';
 import { ORGANIZATION_IMAGES_URL, PUBLIC_IMAGES_URL, SYSTEM_EMAIL } from '../main.js';
 import directory from '../organizacoes_publicas.json';
+import '../developer-guide.css';
+
+const developerGuideUrl = `${import.meta.env.BASE_URL}docs/Manual_Implantacao_API_GateGuard.pdf`;
 
 export function publicHomeScreen(app, openLogin = false) {
   const contactLink = SYSTEM_EMAIL ? `mailto:${encodeURIComponent(SYSTEM_EMAIL)}?subject=Quero cadastrar minha organização no GateGuard` : '#';
@@ -8,7 +11,7 @@ export function publicHomeScreen(app, openLogin = false) {
     <div class="public-page">
       <header class="public-header">
         <button class="public-brand" data-scroll="inicio" aria-label="GateGuard - início"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"></button>
-        <nav aria-label="Navegação principal"><button class="nav-tab is-active" data-scroll="inicio">Início</button><button class="nav-tab" data-scroll="localizar-organizacao">Localizar organização</button><button class="nav-tab" data-scroll="cadastre-se">Para organizações</button><button class="button button-secondary" data-login>Entrar</button></nav>
+        <nav aria-label="Navegação principal"><button class="nav-tab is-active" data-scroll="inicio">Início</button><button class="nav-tab" data-scroll="localizar-organizacao">Localizar organização</button><button class="nav-tab" data-scroll="cadastre-se">Para organizações</button><a class="developer-guide-link" href="${developerGuideUrl}" target="_blank" rel="noopener">Desenvolvedores</a><button class="button button-secondary" data-login>Entrar</button></nav>
       </header>
       <main>
         <section id="inicio" class="public-hero public-screen" data-public-screen>

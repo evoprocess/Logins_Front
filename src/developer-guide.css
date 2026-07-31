@@ -1,0 +1,22 @@
+.developer-guide-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 13px;
+  border: 1px solid #9db8d6;
+  border-radius: 8px;
+  background: #f5f9fd;
+  color: #244a74;
+  font-size: 13px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.developer-guide-link:hover {
+  border-color: #1677ff;
+  background: #eaf4ff;
+  color: #075fc5;
+}
+
+@media (max-width: 850px) {
+  .developer-guide-link { display: none; }
+}
