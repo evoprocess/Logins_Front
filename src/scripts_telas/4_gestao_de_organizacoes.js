@@ -71,14 +71,18 @@ export async function organizationsScreen(app) {
     const [readiness, organizationData] = await Promise.all([api('/api/organization-registration/readiness'), api('/api/organizations')]);
     const form = app.querySelector('#organization-registration');
     form.hidden = false; form.organization.value = readiness.id;
-    app.querySelector('#registration-status').innerHTML = readiness.configured || readiness.automaticProvisioning
-      ? ''
-        : readiness.oauthAvailable
-          ? '<p class="notice">Credenciais detectadas. <button type="button" id="connect-google">Conectar Google Cloud</button></p>'
-          : '<p class="error">O provisionador Google Cloud/Render ainda não foi configurado no backend.</p>';
-    const connect = app.querySelector('#connect-google');
-    if (connect) connect.onclick = async () => { const result = await api('/api/google/oauth/start'); window.open(result.url, 'google-cloud-oauth', 'width=620,height=760'); };
-    const ready = readiness.configured || readiness.automaticProvisioning;
+    app.querySelector('#registration-status').innerHTML = readiness.configured
+      ? `<p class="notice">Firebase manual da ${esc(readiness.id)} detectado (${esc(readiness.firebase?.projectId || '')}). O cadastro está liberado.</p>`
+      : `<div class="notice"><strong>Configuração manual necessária para ${esc(readiness.id)}</strong>
+          <ol><li>Crie o projeto no Firebase e um aplicativo Web.</li><li>Ative Authentication por e-mail/senha e crie o Firestore.</li><li>Publique as regras abaixo no Firestore.</li><li>Adicione no Render a variável <code>${esc(readiness.envName)}</code> com o JSON do Firebase e faça o redeploy.</li></ol>
+          <details><summary>Exibir regras do Firestore</summary><pre id="manual-firestore-rules">${esc(readiness.firestoreRules || '')}</pre><button type="button" id="copy-firestore-rules">Copiar regras</button></details>
+        </div>`;
+    const copyRules = app.querySelector('#copy-firestore-rules');
+    if (copyRules) copyRules.onclick = async () => {
+      await navigator.clipboard.writeText(readiness.firestoreRules || '');
+      copyRules.textContent = 'Regras copiadas';
+    };
+    const ready = readiness.configured;
     app.querySelector('#organization-fields').disabled = !ready;
     app.querySelector('#generate-password').onclick = async () => { form.temporaryPassword.value = (await api('/api/organization-registration/password')).password; };
     const deleteSelect = app.querySelector('#delete-organization');
