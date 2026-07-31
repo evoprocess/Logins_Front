@@ -1,0 +1,33 @@
+.plans-section {
+  min-height: 100svh;
+  padding: 105px max(28px, calc((100vw - 1176px) / 2)) 55px;
+  background: linear-gradient(145deg, #061225, #0b2850);
+  color: #eaf4ff;
+}
+
+.plans-heading { max-width: 790px; margin-bottom: 24px; }
+.plans-heading h2 { margin: 8px 0 10px; font-size: clamp(32px, 4vw, 52px); }
+.plans-heading p { color: #a9c0dc; font-size: 17px; }
+.plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.plan-card { display: flex; flex-direction: column; padding: 24px; border: 1px solid #5b83af; border-radius: 17px; background: #0c1d36; box-shadow: 0 20px 45px #0004; }
+.plan-card.is-featured { border-color: #48a1ff; background: linear-gradient(155deg, #102b51, #0a1a32); box-shadow: 0 22px 55px #087cff2b; }
+.plan-level { color: #70b9ff; font-size: 11px; font-weight: 900; letter-spacing: .14em; }
+.plan-card h3 { margin: 9px 0; color: #fff; font-size: 23px; }
+.plan-card p { min-height: 62px; color: #a8bdd5; line-height: 1.5; }
+.plan-card ul { display: grid; gap: 7px; margin: 10px 0 20px; padding: 0; list-style: none; color: #d4e5f8; }
+.plan-card li::before { margin-right: 8px; color: #62b3ff; content: "✓"; }
+.plan-contact { margin-top: auto; padding: 12px 15px; border-radius: 9px; background: #1677ff; color: #fff; font-weight: 800; text-align: center; text-decoration: none; }
+.plans-comparison { margin-top: 25px; padding: 22px; border: 1px solid #50769e; border-radius: 15px; background: #07162a; }
+.plans-comparison h3 { margin: 0 0 13px; color: #fff; }
+.plans-table-wrap { overflow-x: auto; }
+.plans-comparison table { width: 100%; border-collapse: collapse; min-width: 650px; }
+.plans-comparison th,.plans-comparison td { padding: 10px; border-bottom: 1px solid #294867; text-align: center; }
+.plans-comparison th:first-child,.plans-comparison td:first-child { text-align: left; }
+.plans-comparison th { color: #8dc7ff; }
+.plans-comparison p { margin: 15px 0 0; color: #a9bfd8; }
+
+@media (max-width: 900px) {
+  .plans-section { padding: 95px 18px 40px; }
+  .plans-grid { grid-template-columns: 1fr; }
+  .plan-card p { min-height: 0; }
+}

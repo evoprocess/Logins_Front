@@ -3,6 +3,7 @@ import { ORGANIZATION_IMAGES_URL, PUBLIC_IMAGES_URL, SYSTEM_EMAIL } from '../mai
 import directory from '../organizacoes_publicas.json';
 import '../developer-guide.css';
 import '../responsibilities.css';
+import '../plans-public.css';
 
 const developerGuideUrl = `${import.meta.env.BASE_URL}docs/Manual_Implantacao_API_GateGuard.pdf`;
 
@@ -12,7 +13,7 @@ export function publicHomeScreen(app, openLogin = false) {
     <div class="public-page">
       <header class="public-header">
         <button class="public-brand" data-scroll="inicio" aria-label="GateGuard - início"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"></button>
-        <nav aria-label="Navegação principal"><button class="nav-tab is-active" data-scroll="inicio">Início</button><button class="nav-tab" data-scroll="localizar-organizacao">Localizar organização</button><button class="nav-tab" data-scroll="responsabilidades">Responsabilidades</button><button class="nav-tab" data-scroll="cadastre-se">Para organizações</button><a class="developer-guide-link" href="${developerGuideUrl}" target="_blank" rel="noopener">Desenvolvedores</a><button class="button button-secondary" data-login>Entrar</button></nav>
+        <nav aria-label="Navegação principal"><button class="nav-tab is-active" data-scroll="inicio">Início</button><button class="nav-tab" data-scroll="localizar-organizacao">Localizar organização</button><button class="nav-tab" data-scroll="planos">Planos</button><button class="nav-tab" data-scroll="responsabilidades">Responsabilidades</button><a class="developer-guide-link" href="${developerGuideUrl}" target="_blank" rel="noopener">Desenvolvedores</a><button class="button button-secondary" data-login>Entrar</button></nav>
       </header>
       <main>
         <section id="inicio" class="public-hero public-screen" data-public-screen>
@@ -28,6 +29,16 @@ export function publicHomeScreen(app, openLogin = false) {
           <form id="store-search-form" class="store-search" autocomplete="off"><label for="store-search">Pesquisar Organização</label><div><div class="store-combobox"><input id="store-search" role="combobox" aria-autocomplete="both" aria-expanded="false" aria-controls="store-options"><button type="button" id="toggle-store-options" aria-label="Exibir todas as organizações">⌄</button><div id="store-options" class="store-options" role="listbox" hidden>${directory.floors.flatMap(floor => floor.organizations).filter(organization => organization.status === 'active').map(organization => `<button type="button" role="option" data-store-option="${organization.name}">${organization.name}</button>`).join('')}</div></div><button type="submit">Ir correndo</button></div><span id="store-search-feedback" class="sr-only" aria-live="polite"></span></form>
           <div class="locator-game" tabindex="0" aria-label="Use as setas ou as teclas A e D para caminhar pelas salas."><div class="game-ceiling"><span>PISO <b id="floor-number">1</b></span><i></i><span>GATEGUARD DIRECTORY</span></div><div class="game-world"><div id="store-row" class="store-row"></div><div class="game-floor-lines"></div><div id="game-avatar" class="game-avatar"><span class="avatar-head"></span><span class="avatar-body"></span><span class="avatar-legs"></span></div></div><div id="game-prompt" class="game-prompt">Use ← → ou A D para caminhar</div></div>
           <div id="movement-legend-popup" class="movement-legend-popup" hidden><div><button type="button" id="close-movement-legend" aria-label="Fechar legenda">&times;</button><span>CONTROLES DO AMBIENTE</span><h3>Legenda de movimentos</h3><ul><li><kbd>W A S D</kbd><span>Caminhar pelo ambiente</span></li><li><kbd>↑ ↓ ← →</kbd><span>Movimentação alternativa</span></li><li><kbd>Mouse</kbd><span>Controlar a câmera</span></li><li><kbd>Espaço / Enter</kbd><span>Entrar na organização</span></li><li><kbd>Esc</kbd><span>Liberar o cursor</span></li></ul></div></div>
+        </section>
+
+        <section id="planos" class="plans-section public-screen" data-public-screen>
+          <div class="plans-heading"><span class="public-eyebrow">PLANOS GATEGUARD</span><h2>Escolha o nível de gestão ideal</h2><p>Comece pelo financeiro, centralize também os acessos ou entregue toda a operação tecnológica ao GateGuard.</p></div>
+          <div class="plans-grid">
+            <article class="plan-card"><span class="plan-level">BÁSICO</span><h3>Gestão de Pagamentos</h3><p>Controle financeiro para sistemas que já possuem infraestrutura e autenticação próprias.</p><ul><li>Planos e cobranças</li><li>Vencimentos e pagamentos</li><li>Bloqueio e liberação financeira</li><li>Histórico financeiro</li><li>API de situação financeira</li></ul><a href="${contactLink}" class="plan-contact">Consultar valor</a></article>
+            <article class="plan-card is-featured"><span class="plan-level">PROFISSIONAL</span><h3>Pagamentos e Acessos</h3><p>Gestão financeira com autenticação central e confirmação segura dos acessos.</p><ul><li>Tudo do Plano Básico</li><li>Autenticação de usuários</li><li>Status, perfis e permissões</li><li>Modal de login GateGuard</li><li>API backend-to-backend</li></ul><a href="${contactLink}" class="plan-contact">Consultar valor</a></article>
+            <article class="plan-card"><span class="plan-level">PERSONALIZADO</span><h3>Gestão Completa</h3><p>Operação tecnológica completa administrada conforme as necessidades do sistema.</p><ul><li>Tudo do Plano Profissional</li><li>Banco de dados operacional</li><li>Backend completo</li><li>Frontend completo</li><li>APIs, automações e integrações</li><li>Monitoramento, backups e suporte</li></ul><a href="${contactLink}" class="plan-contact">Consultar valor</a></article>
+          </div>
+          <div class="plans-comparison"><h3>Comparação dos planos</h3><div class="plans-table-wrap"><table><thead><tr><th>Funcionalidade</th><th>Básico</th><th>Profissional</th><th>Personalizado</th></tr></thead><tbody><tr><td>Planos, cobranças e pagamentos</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>Bloqueio financeiro e histórico</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>Autenticação, status e perfis</td><td>—</td><td>✓</td><td>✓</td></tr><tr><td>Modal de login e API de acesso</td><td>—</td><td>✓</td><td>✓</td></tr><tr><td>Banco de dados operacional</td><td>—</td><td>—</td><td>✓</td></tr><tr><td>Backend e frontend completos</td><td>—</td><td>—</td><td>✓</td></tr><tr><td>Automações, monitoramento e backups</td><td>—</td><td>—</td><td>✓</td></tr></tbody></table></div><p>Os valores são definidos conforme o porte, o volume e as necessidades de cada sistema. Entre em contato para receber uma proposta.</p></div>
         </section>
 
         <section id="responsabilidades" class="responsibilities-section public-screen" data-public-screen>
