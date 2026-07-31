@@ -1,22 +1,25 @@
-.developer-guide-link {
-  display: inline-flex;
+.developer-section {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
   align-items: center;
-  padding: 9px 13px;
-  border: 1px solid #9db8d6;
-  border-radius: 8px;
-  background: #f5f9fd;
-  color: #244a74;
-  font-size: 13px;
-  font-weight: 750;
-  text-decoration: none;
+  gap: 55px;
+  min-height: 100svh;
+  padding: 105px max(32px, calc((100vw - 1176px) / 2)) 70px;
+  background: linear-gradient(145deg, #071126, #102b50);
+  color: #eef6ff;
 }
 
-.developer-guide-link:hover {
-  border-color: #1677ff;
-  background: #eaf4ff;
-  color: #075fc5;
-}
+.developer-copy h2 { margin: 9px 0 13px; font-size: clamp(32px, 4vw, 52px); }
+.developer-copy > p { color: #abc1db; font-size: 17px; line-height: 1.65; }
+.developer-copy ul { display: grid; gap: 9px; margin: 22px 0; padding: 0; list-style: none; }
+.developer-copy li::before { margin-right: 9px; color: #65b6ff; content: "✓"; }
+.developer-guide-cta { display: inline-flex; padding: 14px 20px; border-radius: 9px; background: #1677ff; color: #fff; font-weight: 850; text-decoration: none; box-shadow: 0 12px 30px #0878ff42; }
+.developer-preview { display: grid; gap: 14px; padding: 28px; border: 1px solid #6597c9; border-radius: 18px; background: #06152b; box-shadow: 0 25px 65px #0007; }
+.developer-preview > span { color: #68b6ff; font-size: 11px; font-weight: 900; letter-spacing: .15em; }
+.developer-preview strong { font-size: 22px; }
+.developer-preview code { padding: 15px; border: 1px solid #294b70; border-radius: 9px; background: #020b18; color: #cce5ff; overflow-wrap: anywhere; }
+.developer-preview p { margin: 0; color: #91abc8; line-height: 1.55; }
 
 @media (max-width: 850px) {
-  .developer-guide-link { display: none; }
+  .developer-section { grid-template-columns: 1fr; gap: 25px; padding: 95px 18px 45px; }
 }

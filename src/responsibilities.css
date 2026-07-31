@@ -16,8 +16,14 @@
 .responsibilities-grid h3 { margin: 15px 0 12px; color: #102b50; font-size: 23px; }
 .responsibilities-grid ul { display: grid; gap: 9px; margin: 0; padding-left: 20px; color: #4c6074; }
 .responsibilities-limit { margin-top: 22px; padding: 16px 18px; border-left: 4px solid #1677ff; background: #fff; color: #41566c; }
+.how-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 22px; }
+.how-steps article { padding: 21px; border-radius: 15px; background: #102b50; color: #fff; }
+.how-steps span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #168cff; font-weight: 900; }
+.how-steps h3 { margin: 12px 0 7px; }
+.how-steps p { margin: 0; color: #bed2e7; line-height: 1.5; }
 
 @media (max-width: 760px) {
   .responsibilities-section { padding: 95px 18px 40px; }
   .responsibilities-grid { grid-template-columns: 1fr; }
+  .how-steps { grid-template-columns: 1fr; }
 }

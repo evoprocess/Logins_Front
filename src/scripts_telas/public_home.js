@@ -13,7 +13,7 @@ export function publicHomeScreen(app, openLogin = false) {
     <div class="public-page">
       <header class="public-header">
         <button class="public-brand" data-scroll="inicio" aria-label="GateGuard - início"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"></button>
-        <nav aria-label="Navegação principal"><button class="nav-tab is-active" data-scroll="inicio">Início</button><button class="nav-tab" data-scroll="localizar-organizacao">Localizar organização</button><button class="nav-tab" data-scroll="planos">Planos</button><button class="nav-tab" data-scroll="responsabilidades">Responsabilidades</button><a class="developer-guide-link" href="${developerGuideUrl}" target="_blank" rel="noopener">Desenvolvedores</a><button class="button button-secondary" data-login>Entrar</button></nav>
+        <nav aria-label="Navegação principal"><button class="nav-tab is-active" data-scroll="inicio">Início</button><button class="nav-tab" data-scroll="localizar-organizacao">Localizar organização</button><button class="nav-tab" data-scroll="planos">Planos</button><button class="nav-tab" data-scroll="como-funciona">Como Funciona</button><button class="nav-tab" data-scroll="desenvolvedores">Desenvolvedores</button><button class="button button-secondary" data-login>Entrar</button></nav>
       </header>
       <main>
         <section id="inicio" class="public-hero public-screen" data-public-screen>
@@ -43,13 +43,19 @@ export function publicHomeScreen(app, openLogin = false) {
           <dialog id="plans-comparison-modal" class="plans-comparison-modal" aria-labelledby="plans-comparison-title"><div class="plans-comparison"><button type="button" id="close-plans-comparison" class="plans-modal-close" aria-label="Fechar comparação">&times;</button><h3 id="plans-comparison-title">Comparação dos planos</h3><div class="plans-table-wrap"><table><thead><tr><th>Funcionalidade</th><th>Básico</th><th>Profissional</th><th>Personalizado</th></tr></thead><tbody><tr><td>Planos, cobranças e pagamentos</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>Bloqueio financeiro e histórico</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>Autenticação, status e perfis</td><td>—</td><td>✓</td><td>✓</td></tr><tr><td>Modal de login e API de acesso</td><td>—</td><td>✓</td><td>✓</td></tr><tr><td>Banco de dados operacional</td><td>—</td><td>—</td><td>✓</td></tr><tr><td>Backend e frontend completos</td><td>—</td><td>—</td><td>✓</td></tr><tr><td>Automações, monitoramento e backups</td><td>—</td><td>—</td><td>✓</td></tr></tbody></table></div><p>Entre em contato para receber uma proposta adequada ao seu sistema.</p></div></dialog>
         </section>
 
-        <section id="responsabilidades" class="responsibilities-section public-screen" data-public-screen>
-          <div class="responsibilities-heading"><span class="public-eyebrow">TRANSPARÊNCIA OPERACIONAL</span><h2>Quem é responsável por cada parte?</h2><p>O GateGuard protege identidade, acessos e situação financeira. Cada sistema integrado continua responsável por seus dados e operações.</p></div>
+        <section id="como-funciona" class="responsibilities-section public-screen" data-public-screen>
+          <div class="responsibilities-heading"><span class="public-eyebrow">SIMPLES, SEGURO E SOB MEDIDA</span><h2>Como funciona o GateGuard?</h2><p>Escolha o nível de gestão ideal e conecte seu sistema a uma estrutura preparada para cuidar de pagamentos, acessos ou de toda a operação tecnológica.</p></div>
+          <div class="how-steps"><article><span>1</span><h3>Escolha seu plano</h3><p>Comece pelo financeiro, acrescente autenticação ou contrate a gestão tecnológica completa.</p></article><article><span>2</span><h3>Integre seu sistema</h3><p>O GateGuard é incorporado à experiência da sua organização sem exigir mudanças desnecessárias para seus usuários.</p></article><article><span>3</span><h3>Ganhe controle</h3><p>Pagamentos, liberações e acessos passam a seguir regras centralizadas, seguras e fáceis de acompanhar.</p></article></div>
           <div class="responsibilities-grid">
-            <article><span>G</span><h3>GateGuard</h3><ul><li>Login e autenticação</li><li>Perfis e permissões</li><li>Status de acesso</li><li>Vencimentos e bloqueios financeiros</li><li>Geração e validação da chave API</li></ul></article>
-            <article><span>S</span><h3>Sistema integrado</h3><ul><li>Tarefas, projetos e clientes</li><li>Banco de dados operacional</li><li>Frontend, backend e domínio</li><li>Sessão interna após o login</li><li>Proteção da chave no servidor</li></ul></article>
+            <article><span>G</span><h3>O GateGuard cuida</h3><ul><li>Pagamentos, vencimentos e liberações</li><li>Logins, perfis e permissões no Profissional</li><li>Operação tecnológica completa no Personalizado</li></ul></article>
+            <article><span>O</span><h3>Sua organização mantém</h3><ul><li>Autonomia sobre o próprio negócio</li><li>Dados operacionais nos planos Básico e Profissional</li><li>Uma experiência integrada para seus usuários</li></ul></article>
           </div>
-          <p class="responsibilities-limit"><strong>Limite de atuação:</strong> o GateGuard autoriza ou bloqueia a entrada. Os dados e processos internos permanecem sob gestão do sistema integrado.</p>
+          <p class="responsibilities-limit"><strong>Você escolhe até onde o GateGuard atua:</strong> financeiro, pagamentos e acessos, ou a gestão completa do seu ambiente digital.</p>
+        </section>
+
+        <section id="desenvolvedores" class="developer-section public-screen" data-public-screen>
+          <div class="developer-copy"><span class="public-eyebrow">ÁREA PARA DESENVOLVEDORES</span><h2>Integração preparada para o seu backend</h2><p>Documentação prática para incorporar a chave privada, conectar o botão Entrar ao modal GateGuard e validar pagamentos e acessos sem expor credenciais no navegador.</p><ul><li>Integração segura entre servidores</li><li>Variável protegida no ambiente do backend</li><li>Modal de login reutilizável</li><li>Contrato da API, erros e checklist de homologação</li></ul><a class="developer-guide-cta" href="${developerGuideUrl}" target="_blank" rel="noopener">Abrir Guia de Instalação</a></div>
+          <div class="developer-preview"><span>API_GATEGUARD</span><strong>Backend → GateGuard</strong><code>{"id_org":"ORG_XXXX","KEYGG":"gg_live_••••••••"}</code><p>A chave completa permanece somente no servidor do sistema integrado.</p></div>
         </section>
 
         <section id="cadastre-se" class="signup-section public-screen" data-public-screen>
