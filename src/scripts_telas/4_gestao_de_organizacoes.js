@@ -1,6 +1,11 @@
 import { api, state, shell, bindShell, API_URL, SYSTEM_NAME, SYSTEM_EMAIL, SYSTEM_URL } from '../main.js';
 import '../organizations.css';
 import { bindDocumentValidation } from '../document-validation.js';
+import publicDirectory from '../organizacoes_publicas.json';
+
+const publicOrganizationNames = new Map(
+  publicDirectory.floors.flatMap(floor => floor.organizations.map(organization => [organization.id, organization.name]))
+);
 
 const esc = value => {
   const element = document.createElement('span');
@@ -84,7 +89,7 @@ export async function organizationsScreen(app) {
     const integrationSecret = app.querySelector('#integration-secret');
     const generateKey = app.querySelector('#generate-integration-key');
     const revokeKey = app.querySelector('#revoke-integration-key');
-    integrationSelect.innerHTML = '<option value="">Selecione uma organização</option>' + removable.map(item => `<option value="${esc(item.id)}">${esc(item.id)} — ${esc(item.name)}</option>`).join('');
+    integrationSelect.innerHTML = '<option value="">Selecione uma organização</option>' + removable.map(item => `<option value="${esc(item.id)}">${esc(item.id)} — ${esc(publicOrganizationNames.get(item.id) || item.name || item.id)}</option>`).join('');
     integrationSection.hidden = false;
     const loadIntegration = async () => {
       const organization = integrationSelect.value;
