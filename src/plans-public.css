@@ -21,7 +21,13 @@
 .plan-card ul { display: grid; gap: 7px; margin: 10px 0 20px; padding: 0; list-style: none; color: #d4e5f8; }
 .plan-card li::before { margin-right: 8px; color: #62b3ff; content: "✓"; }
 .plan-contact { margin-top: auto; padding: 12px 15px; border-radius: 9px; background: #1677ff; color: #fff; font-weight: 800; text-align: center; text-decoration: none; }
-.plans-comparison { margin-top: 25px; padding: 22px; border: 1px solid #50769e; border-radius: 15px; background: #07162a; }
+.compare-plans-button { display: block; margin: 25px auto 0; padding: 14px 30px; border: 1px solid #72b9ff; border-radius: 10px; background: linear-gradient(135deg, #168cff, #0756bd); color: #fff; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 12px 32px #0878ff42; }
+.compare-plans-button:hover { transform: translateY(-3px); box-shadow: 0 17px 40px #0878ff58; }
+.plans-pricing-note { margin: 11px 0 0; color: #a9bfd8; text-align: center; }
+.plans-comparison-modal { inset: 0; width: min(94vw, 900px); max-height: 88vh; margin: auto; padding: 0; border: 0; border-radius: 17px; background: transparent; color: #eaf4ff; box-shadow: 0 28px 90px #000b; }
+.plans-comparison-modal::backdrop { background: #020b18cf; backdrop-filter: blur(4px); }
+.plans-comparison { position: relative; padding: 27px; border: 1px solid #50769e; border-radius: 15px; background: #07162a; }
+.plans-modal-close { position: absolute; top: 9px; right: 13px; border: 0; background: transparent; color: #afc7e1; font-size: 30px; cursor: pointer; }
 .plans-comparison h3 { margin: 0 0 13px; color: #fff; }
 .plans-table-wrap { overflow-x: auto; }
 .plans-comparison table { width: 100%; border-collapse: collapse; min-width: 650px; }
