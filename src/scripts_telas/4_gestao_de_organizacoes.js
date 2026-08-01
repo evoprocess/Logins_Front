@@ -61,7 +61,12 @@ export async function organizationsScreen(app) {
       <div class="integration-endpoint"><small>Endpoint de autenticação</small><code>POST ${esc(API_URL)}/api/integrations/authenticate</code></div>
       <div id="integration-key-preview" class="integration-key-preview" hidden><small>Chave cadastrada</small><code><span>gg_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</span><strong></strong></code><small>Compare os quatro últimos caracteres com a credencial configurada no backend do lojista.</small></div>
       <div class="integration-actions"><button type="button" id="generate-integration-key">Gerar chave</button><button type="button" id="revoke-integration-key" class="danger-button" hidden>Revogar integração</button></div>
-      <div id="integration-secret" hidden><strong>Copie a chave agora. Ela será exibida somente uma vez.</strong><div><code></code><button type="button" id="copy-integration-key">Copiar</button></div></div>
+      <div id="integration-secret" hidden>
+        <strong>Copie a chave agora. Ela será exibida somente uma vez.</strong>
+        <div><code id="integration-generated-key"></code><button type="button" id="copy-integration-key">Copiar chave</button></div>
+        <p><strong>Configuração no sistema novo:</strong> no Render, abra o serviço de <strong>backend do projeto integrado</strong>, acesse <strong>Environment</strong> e adicione a variável abaixo. Não coloque este segredo no frontend nem no backend do GateGuard.</p>
+        <div><code id="integration-render-variable"></code><button type="button" id="copy-integration-variable">Copiar variável</button></div>
+      </div>
       <p id="integration-feedback"></p>
     </div>
   </section>
@@ -142,8 +147,10 @@ export async function organizationsScreen(app) {
       integrationFeedback.textContent = 'Gerando credencial segura...';
       try {
         const data = await api(`/api/organizations/${encodeURIComponent(integrationSelect.value)}/integration/key`, { method: 'POST' });
-        integrationSecret.querySelector('code').textContent = data.apiKey;
-        integrationFeedback.textContent = 'Chave criada. Configure-a somente no servidor do sistema externo.';
+        const renderVariable = `API_GATEGUARD=${JSON.stringify({ id_org: data.organization, KEYGG: data.apiKey })}`;
+        app.querySelector('#integration-generated-key').textContent = data.apiKey;
+        app.querySelector('#integration-render-variable').textContent = renderVariable;
+        integrationFeedback.textContent = 'Chave criada. Adicione API_GATEGUARD nas variáveis de ambiente do backend do novo sistema no Render.';
         integrationFeedback.className = 'notice';
         await loadIntegration();
         integrationSecret.hidden = false;
@@ -153,8 +160,12 @@ export async function organizationsScreen(app) {
       } finally { generateKey.disabled = false; }
     };
     app.querySelector('#copy-integration-key').onclick = async () => {
-      await navigator.clipboard.writeText(integrationSecret.querySelector('code').textContent);
-      app.querySelector('#copy-integration-key').textContent = 'Copiada';
+      await navigator.clipboard.writeText(app.querySelector('#integration-generated-key').textContent);
+      app.querySelector('#copy-integration-key').textContent = 'Chave copiada';
+    };
+    app.querySelector('#copy-integration-variable').onclick = async () => {
+      await navigator.clipboard.writeText(app.querySelector('#integration-render-variable').textContent);
+      app.querySelector('#copy-integration-variable').textContent = 'Variável copiada';
     };
     revokeKey.onclick = async () => {
       if (!confirm('Revogar a integração desta organização? O sistema externo perderá o acesso imediatamente.')) return;
