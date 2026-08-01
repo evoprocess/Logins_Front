@@ -37,6 +37,21 @@ export async function organizationsScreen(app) {
       <div class="registration-actions"><button type="button" id="generate-password">Gerar Senha</button><button type="submit" title="Ao cadastrar a organização o acesso será enviado para os e-mails administrativo e de acessos">Cadastrar Organização</button></div></section>
     </fieldset><p id="registration-feedback" class="error"></p>
   </form>
+  <section class="form-section developer-internal-manual">
+    <details>
+      <summary><strong>Manual interno do cadastro de organizações · ORG_0000</strong></summary>
+      <p>Este fluxo é exclusivo dos desenvolvedores/administradores autenticados na <code>ORG_0000</code>.</p>
+      <ol>
+        <li>O sistema calcula o próximo identificador no formato <code>ORG_XXXX</code>, preservando uma numeração exclusiva de quatro algarismos.</li>
+        <li>O Firebase da organização deve estar configurado no Render do backend Gate Guard, serviço <code>Logins_Back</code>, pela variável <code>DADOS_FIREBASE_ORG_XXXX</code>.</li>
+        <li>Ao clicar em <strong>Cadastrar Organização</strong>, o backend cria os acessos no Firebase Authentication, grava o administrador no Firestore da organização e registra a organização no Firestore central.</li>
+        <li>Em seguida, o backend atualiza automaticamente <code>src/organizacoes_publicas.json</code> no repositório <code>evoprocess/Logins_Front</code>, preenchendo ID, nome, status ativo, sala e URL pública. O commit inicia a publicação normal do frontend.</li>
+        <li>Para essa automação, <code>Logins_Back</code> precisa da variável secreta <code>GITHUB_FRONTEND_TOKEN</code>, com permissão de escrita apenas no repositório do frontend. Repositório, branch e caminho ficam nas variáveis <code>GITHUB_FRONTEND_REPOSITORY</code>, <code>GITHUB_FRONTEND_BRANCH</code> e <code>GITHUB_PUBLIC_ORGANIZATIONS_PATH</code>.</li>
+        <li>Por fim, o sistema envia o convite de acesso. O cadastro somente é apresentado como concluído depois que todas essas etapas terminam.</li>
+      </ol>
+      <p><strong>Diagnóstico:</strong> se o fluxo parar em “Publicando a organização no JSON público”, verifique o token do GitHub, a permissão de escrita, a branch configurada e se o workflow de publicação do frontend foi executado.</p>
+    </details>
+  </section>
   <section id="api-integration" class="api-integration" hidden>
     <div class="integration-heading"><div><span>INTEGRAÇÃO EXTERNA</span><h2>API GateGuard</h2></div><span id="integration-badge" class="badge">Selecione uma organização</span></div>
     <p>Conecte sistemas externos ao controle terceirizado de login, pagamentos e bloqueios do GateGuard.</p>
