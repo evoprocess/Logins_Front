@@ -44,7 +44,8 @@ export async function organizationsScreen(app) {
       <ol>
         <li>O sistema calcula o próximo identificador no formato <code>ORG_XXXX</code>, preservando uma numeração exclusiva de quatro algarismos.</li>
         <li>O Firebase da organização deve estar configurado no Render do backend Gate Guard, serviço <code>Logins_Back</code>, pela variável <code>DADOS_FIREBASE_ORG_XXXX</code>.</li>
-        <li>Ao clicar em <strong>Cadastrar Organização</strong>, o backend cria os acessos no Firebase Authentication, grava o administrador no Firestore da organização e registra a organização no Firestore central.</li>
+        <li>Depois do redeploy, volte a esta tela, preencha o formulário e clique em <strong>Cadastrar Organização</strong>. A criação ainda não está concluída apenas com a configuração do projeto Firebase.</li>
+        <li>O backend cria os acessos no Firebase Authentication, grava o administrador no Firestore da organização e cria obrigatoriamente o documento <code>logins_geral/ORG_XXXX</code> no Firestore central. Esse documento libera login, pagamentos, acessos e integrações da organização.</li>
         <li>Em seguida, o backend atualiza automaticamente <code>src/organizacoes_publicas.json</code> no repositório <code>evoprocess/Logins_Front</code>, preenchendo ID, nome, status ativo, sala e URL pública. O commit inicia a publicação normal do frontend.</li>
         <li>Para essa automação, <code>Logins_Back</code> precisa da variável secreta <code>GITHUB_FRONTEND_TOKEN</code>, com permissão de escrita apenas no repositório do frontend. Repositório, branch e caminho ficam nas variáveis <code>GITHUB_FRONTEND_REPOSITORY</code>, <code>GITHUB_FRONTEND_BRANCH</code> e <code>GITHUB_PUBLIC_ORGANIZATIONS_PATH</code>.</li>
         <li>Por fim, o sistema envia o convite de acesso. O cadastro somente é apresentado como concluído depois que todas essas etapas terminam.</li>
@@ -87,9 +88,9 @@ export async function organizationsScreen(app) {
     const form = app.querySelector('#organization-registration');
     form.hidden = false; form.organization.value = readiness.id;
     app.querySelector('#registration-status').innerHTML = readiness.configured
-      ? `<p class="notice">Firebase manual da ${esc(readiness.id)} detectado (${esc(readiness.firebase?.projectId || '')}). O cadastro está liberado.</p>`
+      ? `<div class="notice"><strong>Firebase manual da ${esc(readiness.id)} detectado (${esc(readiness.firebase?.projectId || '')}).</strong><p>Finalize o formulário abaixo. Ao clicar em <strong>Cadastrar Organização</strong>, o sistema criará obrigatoriamente <code>${esc(readiness.centralDocumentPath || `logins_geral/${readiness.id}`)}</code> no Firebase central. Sem esse documento, login e integrações retornarão “Organização não encontrada”.</p></div>`
       : `<div class="notice"><strong>Configuração manual necessária para ${esc(readiness.id)}</strong>
-          <ol><li>Crie o projeto no Firebase e um aplicativo Web.</li><li>Ative Authentication por e-mail/senha e crie o Firestore.</li><li>Publique as regras abaixo no Firestore.</li><li>Adicione no Render a variável <code>${esc(readiness.envName)}</code> com o JSON do Firebase e faça o redeploy.</li></ol>
+          <ol><li>Crie o projeto no Firebase e um aplicativo Web.</li><li>Ative Authentication por e-mail/senha e crie o Firestore.</li><li>Publique as regras abaixo no Firestore.</li><li>Adicione no Render a variável <code>${esc(readiness.envName)}</code> com o JSON do Firebase e faça o redeploy.</li><li>Volte a esta tela e conclua o formulário. Somente essa etapa cria <code>${esc(readiness.centralDocumentPath || `logins_geral/${readiness.id}`)}</code> no Firebase central; não considere a organização criada antes da mensagem final de sucesso.</li></ol>
           <details><summary>Exibir regras do Firestore</summary><pre id="manual-firestore-rules">${esc(readiness.firestoreRules || '')}</pre><button type="button" id="copy-firestore-rules">Copiar regras</button></details>
         </div>`;
     const copyRules = app.querySelector('#copy-firestore-rules');
