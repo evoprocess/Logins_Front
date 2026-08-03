@@ -7,9 +7,9 @@ const esc = value => {
 };
 
 export async function homeScreen(app) {
-  const owner = state.session.user.role === 'admin' && state.session.organization.id === 'ORG_0000';
+  const owner = state.session.user.perfil === 'admin' && state.session.organization.id === 'ORG_0000';
   if (!owner) {
-    app.innerHTML = shell(`<div class="hero"><p>Olá,</p><h2>${esc(state.session.user.name)}</h2><p>Você entrou como <strong>${esc(state.session.user.role)}</strong> na organização <strong>${esc(state.session.organization.name)}</strong>.</p></div>`, 'Home');
+    app.innerHTML = shell(`<div class="hero"><p>Olá,</p><h2>${esc(state.session.user.name)}</h2><p>Você entrou como <strong>${esc(state.session.user.perfil)}</strong>, tipo <strong>${esc(state.session.user.tipo)}</strong>, na organização <strong>${esc(state.session.organization.name)}</strong>.</p></div>`, 'Home');
     bindShell();
     return;
   }

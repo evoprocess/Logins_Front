@@ -15,7 +15,7 @@ const esc = value => {
 };
 
 export async function organizationsScreen(app) {
-  if (state.session.organization.id !== 'ORG_0000' || state.session.user.role !== 'admin') return;
+  if (state.session.organization.id !== 'ORG_0000' || state.session.user.perfil !== 'admin') return;
   app.innerHTML = shell(`<div class="panel"><div id="registration-status">Verificando configuração...</div><form id="organization-registration" class="organization-form" hidden>
     <fieldset id="organization-fields" disabled>
       <h2 class="form-section-title">Dados da organização</h2><section class="form-section">

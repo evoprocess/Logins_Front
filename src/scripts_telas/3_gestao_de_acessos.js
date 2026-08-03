@@ -22,8 +22,12 @@ function profileOptions(selected) {
     .map(profile => `<option ${selected === profile ? 'selected' : ''}>${profile}</option>`).join('');
 }
 
+function levelOptions(selected = 1) {
+  return [1, 2].map(level => `<option value="${level}" ${Number(selected) === level ? 'selected' : ''}>Nível ${level}</option>`).join('');
+}
+
 function render(app, organizations) {
-  const admin = state.session.user.role === 'admin';
+  const admin = state.session.user.perfil === 'admin';
   const organizationOptions = organizations
     .map(org => `<option value="${esc(org.id)}">${esc(org.id)} — ${esc(org.name)}</option>`).join('');
   const addForm = admin ? `
@@ -32,6 +36,7 @@ function render(app, organizations) {
       <select name="organization" required><option value="">Selecione uma organização</option>${organizationOptions}</select>
       <input name="login" placeholder="novo.login" required>
       <select name="profile">${profileOptions('gerente')}</select>
+      <select name="tipo" aria-label="Tipo de acesso">${levelOptions(1)}</select>
       <button>Adicionar</button>
     </form>` : '';
 
@@ -47,6 +52,7 @@ function render(app, organizations) {
       return `<div class="user">
         <strong>${esc(login)}</strong>
         <select data-profile="${esc(org.id)}|${esc(login)}" ${disableProfile ? 'disabled' : ''}>${profileOptions(user.perfil)}</select>
+        <select data-level="${esc(org.id)}|${esc(login)}" ${!admin ? 'disabled' : ''}>${levelOptions(user.nivel_acesso || (protectedAdmin ? 2 : 1))}</select>
         <button data-toggle="${esc(org.id)}|${esc(login)}" data-active="${user.status_ativo_login !== true}">${user.status_ativo_login === true ? 'Inativar' : 'Ativar'}</button>
         ${admin ? `<button class="danger" data-delete="${esc(org.id)}|${esc(login)}">Excluir</button>` : ''}
       </div>`;
@@ -85,7 +91,13 @@ function bindActions(app) {
   app.querySelectorAll('[data-profile]').forEach(select => {
     select.onchange = () => {
       const [organization, login] = select.dataset.profile.split('|');
-      act(`/api/access/organizations/${organization}/logins/${encodeURIComponent(login)}`, { profile: select.value });
+      act(`/api/access/organizations/${organization}/logins/${encodeURIComponent(login)}`, { perfil: select.value });
+    };
+  });
+  app.querySelectorAll('[data-level]').forEach(select => {
+    select.onchange = () => {
+      const [organization, login] = select.dataset.level.split('|');
+      act(`/api/access/organizations/${organization}/logins/${encodeURIComponent(login)}`, { tipo: Number(select.value) });
     };
   });
   app.querySelectorAll('[data-org-status]').forEach(button => {
@@ -104,7 +116,7 @@ function bindActions(app) {
     add.onsubmit = event => {
       event.preventDefault();
       const values = Object.fromEntries(new FormData(add));
-      act(`/api/access/organizations/${values.organization}/logins/${encodeURIComponent(values.login.toLowerCase())}`, { profile: values.profile, active: true });
+      act(`/api/access/organizations/${values.organization}/logins/${encodeURIComponent(values.login.toLowerCase())}`, { perfil: values.profile, tipo: Number(values.tipo), active: true });
     };
   }
 }

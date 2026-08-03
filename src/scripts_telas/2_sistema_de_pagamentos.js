@@ -37,7 +37,7 @@ function bindCheckout(app) {
 }
 
 export async function paymentsScreen(app) {
-  const administrator = state.session.user.role === 'admin' && state.session.organization.id === 'ORG_0000';
+  const administrator = state.session.user.perfil === 'admin' && state.session.organization.id === 'ORG_0000';
   app.innerHTML = shell(`<div class="panel">
     ${administrator ? `<form id="plan-form" class="add-form">
       <h2 id="plan-form-title">Cadastrar plano mensal</h2>
