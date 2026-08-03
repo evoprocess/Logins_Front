@@ -45,7 +45,9 @@ export async function organizationsScreen(app) {
         <li>O sistema calcula o próximo identificador no formato <code>ORG_XXXX</code>, preservando uma numeração exclusiva de quatro algarismos.</li>
         <li>O Firebase da organização deve estar configurado no Render do backend Gate Guard, serviço <code>Logins_Back</code>, pela variável <code>DADOS_FIREBASE_ORG_XXXX</code>.</li>
         <li>Depois do redeploy, volte a esta tela, preencha o formulário e clique em <strong>Cadastrar Organização</strong>. A criação ainda não está concluída apenas com a configuração do projeto Firebase.</li>
-        <li>O backend cria os acessos no Firebase Authentication, grava o administrador no Firestore da organização e cria obrigatoriamente o documento <code>logins_geral/ORG_XXXX</code> no Firestore central. Esse documento libera login, pagamentos, acessos e integrações da organização.</li>
+        <li>O mesmo usuário <code>org_XXXX-gestor@sislogin.com.br</code> e a mesma senha do login geral devem existir no Firebase Authentication central e no Firebase Authentication da organização.</li>
+        <li>No Firestore da organização, crie a coleção <code>logins</code> e o documento <code>gestor</code>, contendo obrigatoriamente os campos string <code>cargo</code> e <code>nome</code>. Exemplo: <code>cargo: "Gerente Operacional"</code> e <code>nome: "Caique Jorge Neymário"</code>.</li>
+        <li>O backend cria esses acessos durante o cadastro, grava o administrador no Firestore da organização e cria obrigatoriamente o documento <code>logins_geral/ORG_XXXX</code> no Firestore central. Se a configuração for feita manualmente, mantenha exatamente a mesma estrutura. Esse documento libera login, pagamentos, acessos e integrações da organização.</li>
         <li>Em seguida, o backend atualiza automaticamente <code>src/organizacoes_publicas.json</code> no repositório <code>evoprocess/Logins_Front</code>, preenchendo ID, nome, status ativo, sala e URL pública. O commit inicia a publicação normal do frontend.</li>
         <li>Para essa automação, <code>Logins_Back</code> precisa da variável secreta <code>GITHUB_FRONTEND_TOKEN</code>, com permissão de escrita apenas no repositório do frontend. Repositório, branch e caminho ficam nas variáveis <code>GITHUB_FRONTEND_REPOSITORY</code>, <code>GITHUB_FRONTEND_BRANCH</code> e <code>GITHUB_PUBLIC_ORGANIZATIONS_PATH</code>.</li>
         <li>Por fim, o sistema envia o convite de acesso. O cadastro somente é apresentado como concluído depois que todas essas etapas terminam.</li>
@@ -69,6 +71,9 @@ export async function organizationsScreen(app) {
         <div><code id="integration-render-variable-value"></code><button type="button" id="copy-integration-variable-value">Copiar valor</button></div>
         <div><code>Key: GATEGUARD_API_URL</code></div>
         <div><code>Value: https://logins-back.onrender.com</code></div>
+        <p><strong>Sessão:</strong> consulte <code>SESSION_SECRET</code> no Render do backend GateGuard <code>Logins_Back</code>. Se ela ainda não existir, crie-a somente uma vez no <code>Logins_Back</code> com uma chave aleatória de pelo menos 32 caracteres. Configure também <code>SESSION_SECRET</code> no Render do backend da organização usando esse valor existente.</p>
+        <div><code>Key: SESSION_SECRET</code></div>
+        <div><code>PowerShell: $secretRng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider; $secretBytes = New-Object byte[] 32; $secretRng.GetBytes($secretBytes); ($secretBytes | ForEach-Object { $_.ToString("x2") }) -join ""; $secretRng.Dispose()</code></div>
       </div>
       <p id="integration-feedback"></p>
     </div>
