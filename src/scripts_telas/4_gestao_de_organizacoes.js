@@ -64,9 +64,11 @@ export async function organizationsScreen(app) {
       <div id="integration-secret" hidden>
         <strong>Copie a chave agora. Ela será exibida somente uma vez.</strong>
         <div><code id="integration-generated-key"></code><button type="button" id="copy-integration-key">Copiar chave</button></div>
-        <p><strong>Configuração no sistema novo:</strong> no Render, abra o serviço de <strong>backend do projeto integrado</strong>, acesse <strong>Environment</strong> e crie a variável usando os campos separados abaixo. Não inclua <code>API_GATEGUARD=</code> no valor e não coloque este segredo no frontend nem no backend do GateGuard.</p>
+        <p><strong>Configuração no sistema novo:</strong> no Render, abra o serviço de <strong>backend do projeto integrado</strong>, acesse <strong>Environment</strong> e adicione obrigatoriamente as duas variáveis abaixo. Não inclua <code>API_GATEGUARD=</code> no valor e não coloque esse segredo no frontend nem no backend do GateGuard.</p>
         <div><code>Key: API_GATEGUARD</code><button type="button" id="copy-integration-variable-name">Copiar nome</button></div>
         <div><code id="integration-render-variable-value"></code><button type="button" id="copy-integration-variable-value">Copiar valor</button></div>
+        <div><code>Key: GATEGUARD_API_URL</code></div>
+        <div><code>Value: https://logins-back.onrender.com</code></div>
       </div>
       <p id="integration-feedback"></p>
     </div>
@@ -152,7 +154,7 @@ export async function organizationsScreen(app) {
         app.querySelector('#integration-generated-key').textContent = data.apiKey;
         app.querySelector('#integration-render-variable-value').textContent = `Value: ${renderVariableValue}`;
         app.querySelector('#integration-render-variable-value').dataset.copyValue = renderVariableValue;
-        integrationFeedback.textContent = 'Chave criada. Adicione API_GATEGUARD nas variáveis de ambiente do backend do novo sistema no Render.';
+        integrationFeedback.textContent = 'Chave criada. Adicione API_GATEGUARD e GATEGUARD_API_URL nas variáveis de ambiente do backend do novo sistema no Render.';
         integrationFeedback.className = 'notice';
         await loadIntegration();
         integrationSecret.hidden = false;
