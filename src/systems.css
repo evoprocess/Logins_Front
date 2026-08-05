@@ -44,6 +44,11 @@
 .system-form fieldset:disabled { opacity: .55; }
 .registration-progress { display: grid; gap: 6px; margin-top: 16px; padding: 14px; border: 1px solid #84adff; border-radius: 10px; background: #eff4ff; color: #142b4f; }
 .registration-progress small { color: #475467; }
+.registration-timeline { display: grid; gap: 8px; margin: 8px 0; padding: 0; list-style: none; }
+.registration-timeline li { display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: start; padding: 8px 10px; border-radius: 7px; background: #fff; color: #475467; }
+.registration-timeline li.is-completed { color: #067647; background: #ecfdf3; }
+.registration-timeline li.is-processing { color: #175cd3; background: #eff8ff; }
+.registration-progress #resume-registration { width: fit-content; min-height: 44px; padding: 10px 15px; border: 0; border-radius: 8px; background: #155eef; color: #fff; font-weight: 800; cursor: pointer; }
 @media (max-width: 700px) { .system-form .form-section, .firebase-checks, .credential-fields { grid-template-columns: 1fr; } }
 .system-danger { margin-top: 34px; padding: 20px; border: 2px solid #d92d20; border-radius: 12px; background: #fff6f5; display: grid; gap: 14px; }
 .system-danger[hidden] { display: none; }

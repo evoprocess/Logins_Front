@@ -327,14 +327,31 @@ export async function systemsScreen(app) {
       const submit = registrationSubmit;
       submit.disabled = true;
       feedback.textContent = 'Iniciando o cadastro...'; feedback.className = 'registration-progress';
-      try {
-        const { jobId } = await api('/api/system-registration/jobs', { method: 'POST', body: JSON.stringify(values) });
+      const renderProgress = status => {
+        const stages = (status.history || []).filter(item => item.id);
+        const icon = value => value === 'completed' ? '&#10003;' : value === 'processing' ? '&#8635;' : '&#8226;';
+        feedback.innerHTML = `<strong>Implantação do sistema</strong><ol class="registration-timeline">${stages.map(item => `<li class="is-${esc(item.status || 'info')}"><span>${icon(item.status)}</span><span>${esc(item.message)}</span></li>`).join('')}</ol>${status.state === 'failed' ? `<p class="error">${esc(status.error || 'Não foi possível concluir o cadastro.')}</p><button type="button" id="resume-registration">Continuar da etapa pendente</button>` : '<small>As etapas concluídas são preservadas. Não feche esta página enquanto o processo estiver em andamento.</small>'}`;
+      };
+      const monitorJob = async jobId => {
         let status;
         do {
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise(resolve => setTimeout(resolve, 1200));
           status = await api(`/api/system-registration/jobs/${encodeURIComponent(jobId)}`);
-          feedback.innerHTML = `<strong>Criação em andamento</strong><span>${esc(status.message)}</span><small>A etapa atual será interrompida rapidamente se houver erro de permissão. Não feche esta página.</small>`;
+          renderProgress(status);
         } while (status.state === 'processing');
+        return status;
+      };
+      try {
+        const { jobId } = await api('/api/system-registration/jobs', { method: 'POST', body: JSON.stringify(values) });
+        let status = await monitorJob(jobId);
+        while (status.state === 'failed') {
+          const resume = feedback.querySelector('#resume-registration');
+          if (!resume) break;
+          await new Promise(resolve => { resume.onclick = resolve; });
+          resume.disabled = true;
+          await api(`/api/system-registration/jobs/${encodeURIComponent(jobId)}/resume`, { method: 'POST' });
+          status = await monitorJob(jobId);
+        }
         if (status.state === 'failed') throw new Error(status.error || 'Não foi possível concluir o cadastro.');
         const result = status.result;
         feedback.textContent = `${result.system} cadastrada. Acesso enviado para ${result.recipients.join(', ')}.`; feedback.className = 'notice';
