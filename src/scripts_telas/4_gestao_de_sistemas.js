@@ -30,8 +30,8 @@ export async function systemsScreen(app) {
       <h2 class="form-section-title">Dados do administrador</h2><section class="form-section">
       <label>Nome do Administrador*<input name="administratorName" required maxlength="120" autocapitalize="characters"></label><label>CPF*<input name="administratorCpf" required inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></label>
       <label>Cargo*<input name="administratorRole" required maxlength="100" autocapitalize="characters"></label><label>E-mail administrativo*<input name="adminEmail" type="email" required></label>
-      <details><summary>Outros destinatários de e-mail</summary>
-        <label>E-mail de acessos<input name="accessEmail" type="email"></label><label>E-mail financeiro<input name="financialEmail" type="email"></label><label>E-mail de comunicados<input name="communicationsEmail" type="email"></label>
+      <details><summary>Outros destinatários de e-mail (opcional)</summary>
+        <label>E-mail de acessos (opcional)<input name="accessEmail" type="email"></label><label>E-mail financeiro (opcional)<input name="financialEmail" type="email"></label><label>E-mail de comunicados (opcional)<input name="communicationsEmail" type="email"></label>
       </details>
       <div class="credential-fields"><label>Login<input value="gestor" readonly></label><label>Senha*<span class="registration-password-control"><input name="temporaryPassword" type="password" required minlength="8" maxlength="64" pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,64}" autocomplete="new-password" title="Use de 8 a 64 caracteres, com pelo menos uma letra e um número"><button type="button" id="toggle-registration-password" aria-label="Exibir senha" title="Exibir senha" aria-pressed="false"><span aria-hidden="true">&#128065;</span></button><button type="button" id="generate-password" aria-label="Gerar nova senha" title="Gerar nova senha"><span aria-hidden="true">&#8635;</span></button></span></label></div>
       <div class="registration-actions"><button type="submit" id="register-system-button" disabled title="Preencha corretamente todos os campos obrigatórios">Cadastrar Sistema</button></div></section>
