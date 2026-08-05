@@ -1,5 +1,5 @@
 import { loginScreen } from './0_login.js';
-import { SYSTEM_IMAGES_URL, PUBLIC_IMAGES_URL, SYSTEM_EMAIL } from '../main.js';
+import { PUBLIC_IMAGES_URL, SYSTEM_EMAIL } from '../main.js';
 import directory from '../sistemas_publicos.json';
 import '../developer-guide.css';
 import '../responsibilities.css';
@@ -137,7 +137,7 @@ function bindSystemGame(app, openLogin) {
   const render = floorId => {
     stores = directory.floors.find(floor => floor.id === floorId)?.systems || []; position = 0;
     app.querySelector('#floor-number').textContent = floorId;
-    storeRow.innerHTML = stores.map((system, index) => `<button class="game-store is-${system.status}" data-store="${index}"><span class="room-number">SALA ${system.room}</span><span class="store-sign">${system.status === 'active' ? `<img src="${SYSTEM_IMAGES_URL}/${system.id}/logo.png" alt="">` : '<i>◇</i>'}<b>${system.id}</b></span><span class="store-door">${system.status === 'active' ? 'ENTRADA' : 'EM CONSTRUÇÃO...'}</span></button>`).join('');
+    storeRow.innerHTML = stores.map((system, index) => `<button class="game-store is-${system.status}" data-store="${index}"><span class="room-number">SALA ${system.room}</span><span class="store-sign">${system.status === 'active' && system.logo ? `<img src="${import.meta.env.BASE_URL}${system.logo}" alt="">` : system.status === 'active' ? '' : '<i>◇</i>'}<b>${system.id}</b></span><span class="store-door">${system.status === 'active' ? 'ENTRADA' : 'EM CONSTRUÇÃO...'}</span></button>`).join('');
     storeRow.querySelectorAll('[data-store]').forEach(button => { button.onclick = () => { position = Number(button.dataset.store); update(); if (selected()?.status === 'active') enter(); }; });
     app.querySelectorAll('[data-floor]').forEach(button => button.classList.toggle('is-active', Number(button.dataset.floor) === floorId)); update();
   };

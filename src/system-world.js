@@ -177,7 +177,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
           active,
           active ? system.id === 'SIS_0000'
             ? `${import.meta.env.BASE_URL}imagens_pub/gateguard_logo.png`
-            : `${import.meta.env.BASE_URL}imagens/${encodeURIComponent(system.id)}/logo.png`
+            : system.logo ? `${import.meta.env.BASE_URL}${system.logo}` : ''
           : ''
         )
       }));

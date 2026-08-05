@@ -1,4 +1,4 @@
-import { API_URL, SYSTEM_IMAGES_URL, PUBLIC_IMAGES_URL, state, navigate } from '../main.js';
+import { API_URL, PUBLIC_IMAGES_URL, state, navigate } from '../main.js';
 import publicDirectory from '../sistemas_publicos.json';
 
 const esc = value => {
@@ -9,6 +9,8 @@ const esc = value => {
 
 export function loginScreen(app, options = {}) {
   const gateGuardAccess = options.system === 'SIS_0000';
+  const publicSystem = publicDirectory.floors.flatMap(floor => floor.systems).find(item => item.id === options.system);
+  const systemLogo = gateGuardAccess ? `${PUBLIC_IMAGES_URL}/gateguard_logo.png` : publicSystem?.logo ? `${import.meta.env.BASE_URL}${publicSystem.logo}` : '';
   const modal = document.createElement('div');
   modal.className = 'login-modal';
   modal.setAttribute('role', 'dialog');
@@ -20,7 +22,7 @@ export function loginScreen(app, options = {}) {
       <button class="login-close" type="button" data-close-login aria-label="Fechar login">&times;</button>
       <div class="brand"><img src="${PUBLIC_IMAGES_URL}/gateguard_logo.png" alt="GateGuard"></div>
       <div class="login-heading"><span>${gateGuardAccess ? 'ACESSO INTERNO GATEGUARD' : 'ÁREA DO SISTEMA'}</span><h2 id="login-title">${gateGuardAccess ? 'Funcionários e administradores' : 'Acesso à plataforma'}</h2><p>${gateGuardAccess ? 'Área exclusiva da equipe administrativa do GateGuard.' : 'Login destinado ao sistema integrado para administrar sua conta e os pagamentos do GateGuard.'}</p></div>
-      ${options.systemName ? `<div class="login-store"><img src="${options.system === 'SIS_0000' ? `${PUBLIC_IMAGES_URL}/gateguard_logo.png` : `${SYSTEM_IMAGES_URL}/${encodeURIComponent(options.system)}/logo.png`}" alt=""><div><small>Você está entrando em</small><strong>${esc(options.systemName)}</strong></div></div>` : ''}
+      ${options.systemName ? `<div class="login-store">${systemLogo ? `<img src="${systemLogo}" alt="">` : ''}<div><small>Você está entrando em</small><strong>${esc(options.systemName)}</strong></div></div>` : ''}
       <aside class="client-access" id="client-access" ${gateGuardAccess ? 'hidden' : ''}>
         <div><span>VOCÊ É CLIENTE?</span><strong id="client-system-name">Acesse pelo site da seu sistema</strong><small id="client-access-message">Informe o sistema para localizar o portal correto.</small></div>
         <a id="client-access-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Ir para o portal</a>
