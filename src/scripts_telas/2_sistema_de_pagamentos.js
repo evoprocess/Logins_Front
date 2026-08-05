@@ -51,7 +51,7 @@ export async function paymentsScreen(app) {
       <input name="serviceDescription" placeholder="Descrição do serviço" required><input name="value" type="number" min="5" step=".01" placeholder="Valor único" required>
       <input name="dueDate" type="date" required><button>Gerar fatura avulsa</button>
     </form>` : '<div class="notice">Aqui você acompanha seu plano mensal e paga as faturas disponíveis.</div>'}
-    <p id="pay-error" class="error"></p><div id="plans">Carregando...</div><div id="payment-checkout" class="payment-checkout" hidden></div>
+    <p id="pay-error" class="error"></p><div id="plans">Carregando...</div><div id="payment-history"></div><div id="payment-checkout" class="payment-checkout" hidden></div>
   </div>`, 'Sistema de Pagamento');
   bindShell();
 
@@ -92,6 +92,8 @@ export async function paymentsScreen(app) {
     const data = await api('/api/payments');
     const plans = data.plans || [];
     const extras = data.extras || [];
+    const history = data.history || [];
+    app.querySelector('#payment-history').innerHTML = `<section class="org"><h2>Histórico financeiro</h2>${history.map(payment => `<div class="user"><strong>${esc(payment.organization)}</strong><span>Vencimento: ${esc(payment.dueDate || '—')}</span><span>R$ ${money(payment.value)}</span><span class="badge">${esc(payment.status)}</span></div>`).join('') || '<p>Nenhum pagamento registrado no histórico.</p>'}</section>`;
     app.querySelector('#plans').innerHTML = `${plans.map(plan => `<section class="org">
       <div class="org-head"><div><h2>${esc(plan.externalReference)}</h2><p>Plano mensal — R$ ${money(plan.value)} | Próximo vencimento: ${esc(plan.nextDueDate || '—')} | ${esc(plan.status)}</p></div>
       ${administrator ? `<button type="button" data-edit-plan="${esc(plan.id)}" data-value="${esc(plan.value)}" data-due="${esc(plan.nextDueDate)}">Editar plano</button>` : ''}</div>
