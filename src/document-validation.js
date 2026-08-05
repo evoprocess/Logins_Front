@@ -25,12 +25,23 @@ export function validCnpj(value) {
 }
 
 export function bindDocumentValidation(input, type = () => digits(input.value).length === 14 ? 'CNPJ' : 'CPF') {
-  const validate = () => {
+  const error = document.createElement('small');
+  error.className = 'document-validation-error';
+  error.hidden = true;
+  error.setAttribute('role', 'alert');
+  input.insertAdjacentElement('afterend', error);
+  let touched = false;
+  const validate = (show = touched) => {
     const selectedType = type();
     const valid = selectedType === 'CNPJ' ? validCnpj(input.value) : validCpf(input.value);
-    input.setCustomValidity(valid ? '' : `${selectedType} inválido.`);
+    const message = valid ? '' : `${selectedType} inválido.`;
+    input.setCustomValidity(message);
+    error.textContent = message;
+    error.hidden = !show || valid || !input.value.trim();
+    input.setAttribute('aria-invalid', String(!valid && Boolean(input.value.trim())));
+    return valid;
   };
-  input.addEventListener('input', validate);
-  input.addEventListener('blur', validate);
+  input.addEventListener('input', () => validate());
+  input.addEventListener('blur', () => { touched = true; validate(true); });
   return validate;
 }

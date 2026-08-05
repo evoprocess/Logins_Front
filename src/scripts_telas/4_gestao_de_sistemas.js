@@ -21,7 +21,7 @@ export async function systemsScreen(app) {
       <h2 class="form-section-title">Dados do sistema</h2><section class="form-section">
       <div class="system-left-column"><div class="system-fields"><input name="systemEmail" type="hidden" value="${esc(SYSTEM_EMAIL)}"><input name="systemUrl" type="hidden" value="${esc(SYSTEM_URL)}"><label>ID do Sistema<input name="system" readonly></label></div>
       <div class="system-main-fields"><label>Nome do Sistema*<input name="name" required maxlength="120" autocapitalize="characters"></label>
-        <div class="phone-field"><label>Telefone*<input name="phone" required inputmode="numeric" maxlength="14" placeholder="(00)00000-0000" pattern="\(\d{2}\)\d{4,5}-\d{4}" title="Informe DDD e telefone com 8 ou 9 dígitos"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Whatsapp</label></div>
+        <div class="phone-field"><label>Telefone*<input name="phone" required inputmode="numeric" maxlength="14" placeholder="(00)00000-0000" pattern="[(][0-9]{2}[)][0-9]{4,5}-[0-9]{4}" title="Informe DDD e telefone com 8 ou 9 dígitos"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Whatsapp</label></div>
       </div></div><div class="document-group">
         <div class="document-type-field"><span>Tipo de documento*</span><div class="document-type-selector" role="radiogroup" aria-label="Tipo de documento"><label><input type="radio" name="documentType" value="CPF" required><span>CPF</span></label><label><input type="radio" name="documentType" value="CNPJ" required checked><span>CNPJ</span></label></div></div>
         <label><span id="system-document-label">CNPJ*</span><input name="cpfCnpj" required inputmode="numeric"></label>

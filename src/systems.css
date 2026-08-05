@@ -6,6 +6,9 @@
 .system-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
 .system-form input, .system-form select { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #d0d5dd; border-radius: 9px; background: #fff; }
 .system-form input:disabled { background: #f2f4f7; color: #98a2b3; cursor: not-allowed; }
+.system-form .document-validation-error { color: #b42318; font-size: 12px; font-weight: 700; }
+.system-form .document-validation-error[hidden] { display: none; }
+.system-form input[aria-invalid="true"] { border-color: #d92d20; box-shadow: 0 0 0 3px rgb(217 45 32 / 10%); }
 .system-left-column, .system-fields { display: grid; align-content: start; gap: 14px; }
 .system-main-fields { display: grid; align-content: start; gap: 14px; }
 .document-type-field { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
