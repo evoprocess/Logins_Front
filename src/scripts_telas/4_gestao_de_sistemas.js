@@ -361,7 +361,17 @@ export async function systemsScreen(app) {
         }
         if (status.state === 'failed') throw new Error(status.error || 'Não foi possível concluir o cadastro.');
         const result = status.result;
-        feedback.textContent = `${result.system} cadastrada. Acesso enviado para ${result.recipients.join(', ')}.`; feedback.className = 'notice';
+        const credentials = result.credentials || { system: result.system, login: result.login, password: values.temporaryPassword, url: values.systemUrl };
+        renderProgress(status);
+        feedback.insertAdjacentHTML('beforeend', `<section class="registration-result"><h3>Cadastro criado com sucesso</h3>${result.emailSent ? `<p class="notice">Os dados de acesso foram enviados para ${esc(result.recipients.join(', '))}.</p>` : `<p class="registration-email-warning"><strong>O e-mail não foi enviado.</strong> Informe os dados abaixo manualmente ao gestor do novo sistema.</p>`}<dl><div><dt>Sistema</dt><dd><code>${esc(credentials.system)}</code></dd></div><div><dt>Login</dt><dd><code>${esc(credentials.login)}</code></dd></div><div><dt>Senha</dt><dd><code>${esc(credentials.password)}</code></dd></div><div><dt>Link</dt><dd><code>${esc(credentials.url)}</code></dd></div></dl><button type="button" id="copy-registration-access">Copiar dados de acesso</button></section>`);
+        feedback.querySelector('#copy-registration-access').onclick = async event => {
+          await navigator.clipboard.writeText(`Sistema: ${credentials.system}\nLogin: ${credentials.login}\nSenha: ${credentials.password}\nLink: ${credentials.url}`);
+          event.currentTarget.textContent = 'Dados copiados';
+        };
+        if (!integrationSelect.querySelector(`option[value="${CSS.escape(result.system)}"]`)) {
+          integrationSelect.insertAdjacentHTML('beforeend', `<option value="${esc(result.system)}">${esc(result.system)} — ${esc(values.name || result.system)}</option>`);
+        }
+        integrationSection.hidden = false;
         form.querySelector('fieldset').disabled = true;
       } catch (error) { feedback.textContent = error.message; feedback.className = 'error'; synchronizeRegistration(); }
     };
