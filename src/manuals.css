@@ -15,10 +15,12 @@
 .manual-card footer i { color: #1769c2; font-style: normal; }
 .public-manual { border-style: dashed; }
 .internal-manual { border-top: 4px solid #c55322; }.internal-manual > span { color: #a33d15; }.public-manual { border-top: 4px solid #238653; }.public-manual > span { color: #197143; }
+.internal-manual > em { align-self: flex-start; margin-top: 10px; padding: 5px 8px; border-radius: 5px; background: #fff0e9; color: #8a2f10; font-size: .66rem; font-style: normal; font-weight: 800; letter-spacing: .05em; }.security-confidential > em { background: #fce8ec; color: #941d37; }.security-internal > em { background: #e8f2ff; color: #075bb8; }
 .manual-group-title { margin: 34px 0 16px; color: #082653; font-size: 1.15rem; }
 .manual-group-title::before { display: inline-block; margin-right: 9px; padding: 3px 7px; border-radius: 5px; font-size: .67rem; vertical-align: 2px; }.internal-title::before { content: 'INTERNO'; color: #8a2f10; background: #fff0e9; }.public-title::before { content: 'PÚBLICO'; color: #12613a; background: #eaf9f0; }
 .manual-toolbar { position: sticky; top: 10px; z-index: 5; display: flex; justify-content: space-between; gap: 12px; margin-bottom: 18px; padding: 12px; background: rgba(240,245,251,.94); backdrop-filter: blur(8px); border-radius: 12px; }
 .manual-toolbar button { padding: 10px 16px; border: 0; border-radius: 8px; background: #082653; color: #fff; cursor: pointer; }
+.manual-toolbar > div { display: flex; gap: 8px; }.manual-toolbar #manual-download { background: #1769c2; }
 .manual-document { max-width: 900px; margin: auto; background: #fff; color: #172033; box-shadow: 0 16px 50px rgba(8,38,83,.14); font: 16px/1.62 Inter,Segoe UI,Arial,sans-serif; }
 .manual-cover { position: relative; min-height: 560px; padding: 42px 64px 54px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; color: #fff; background: linear-gradient(145deg,#04152d,#082f62 58%,#0d67bd); }
 .manual-cover::after { content: ''; position: absolute; inset: auto -12% -45% 20%; height: 72%; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; transform: rotate(-8deg); }
