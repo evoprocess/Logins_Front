@@ -33,8 +33,10 @@ export async function homeScreen(app) {
   app.querySelectorAll('[data-admin-page]').forEach(button => { button.onclick = () => navigate(button.dataset.adminPage); });
   try {
     const data = await api('/api/access/systems');
-    app.querySelector('#admin-sis-count').textContent = data.systems.filter(system => system.id !== 'SIS_0000' && system.sistema_implantado === true).length;
+    const counter = app.querySelector('#admin-sis-count');
+    if (counter) counter.textContent = data.systems.filter(system => system.id !== 'SIS_0000' && system.sistema_implantado === true).length;
   } catch {
-    app.querySelector('#admin-sis-count').textContent = '!';
+    const counter = app.querySelector('#admin-sis-count');
+    if (counter) counter.textContent = '!';
   }
 }
