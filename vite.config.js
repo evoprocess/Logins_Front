@@ -7,7 +7,7 @@ const root = fileURLToPath(new URL('.', import.meta.url));
 export default defineConfig({
   base: '/Logins_Front/',
   plugins: [{
-    name: 'copy-organization-logos',
+    name: 'copy-system-logos',
     closeBundle() {
       cpSync(`${root}imagens`, `${root}dist/imagens`, { recursive: true });
     }

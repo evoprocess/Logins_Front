@@ -58,7 +58,7 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
-  renderer.domElement.setAttribute('aria-label', 'Ambiente tridimensional das organizações');
+  renderer.domElement.setAttribute('aria-label', 'Ambiente tridimensional dos sistemas');
   container.prepend(renderer.domElement);
   const controls = new PointerLockControls(camera, renderer.domElement);
   const timer = new THREE.Timer();
@@ -136,13 +136,13 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
       const child = shops.children.pop();
       child.traverse(item => { item.geometry?.dispose(); if (item.material?.map) item.material.map.dispose(); item.material?.dispose(); });
     }
-    const organizations = directory.floors.find(floor => floor.id === id)?.organizations || [];
-    organizations.forEach((organization, index) => {
+    const systems = directory.floors.find(floor => floor.id === id)?.systems || [];
+    systems.forEach((system, index) => {
       let side;
       let z;
-      if (id === 1 && organization.id === 'ORG_0000') {
+      if (id === 1 && system.id === 'SIS_0000') {
         side = -1; z = -5;
-      } else if (id === 1 && organization.id === 'ORG_0001') {
+      } else if (id === 1 && system.id === 'SIS_0001') {
         side = -1; z = -13;
       } else if (id === 1) {
         const slot = index - 2;
@@ -153,9 +153,9 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
         z = -5 - Math.floor(index / 2) * 11;
       }
       const group = new THREE.Group();
-      const gateGuardStore = organization.id === 'ORG_0000';
+      const gateGuardStore = system.id === 'SIS_0000';
       const frame = new THREE.Mesh(new THREE.BoxGeometry(gateGuardStore ? 3.55 : 2.8, 3.2, .45), new THREE.MeshStandardMaterial({ color: 0xf0f3f6, metalness: .38, roughness: .4 }));
-      const doorMaterial = organization.status === 'active' ? materials.door.clone() : materials.blocked.clone();
+      const doorMaterial = system.status === 'active' ? materials.door.clone() : materials.blocked.clone();
       const doors = [];
       if (gateGuardStore) {
         [-.44, .44].forEach(x => {
@@ -168,26 +168,26 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
         door.position.set(0, -.35, .31);
         doors.push(door);
       }
-      const active = organization.status === 'active';
+      const active = system.status === 'active';
       const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.45, .86), new THREE.MeshBasicMaterial({
         side: THREE.DoubleSide,
         map: signTexture(
-          active ? organization.name : 'Em construção...',
+          active ? system.name : 'Em construção...',
           active ? 'ENTRADA' : 'AGUARDE NOVIDADES',
           active,
-          active ? organization.id === 'ORG_0000'
+          active ? system.id === 'SIS_0000'
             ? `${import.meta.env.BASE_URL}imagens_pub/gateguard_logo.png`
-            : `${import.meta.env.BASE_URL}imagens/${encodeURIComponent(organization.id)}/logo.png`
+            : `${import.meta.env.BASE_URL}imagens/${encodeURIComponent(system.id)}/logo.png`
           : ''
         )
       }));
       sign.position.set(0, 1.75, .25);
       if (side < 0) { group.rotation.y = Math.PI / 2; group.position.set(-4.72, 1.65, z); }
       else { group.rotation.y = -Math.PI / 2; group.position.set(4.72, 1.65, z); }
-      group.add(frame, ...doors, sign); group.userData = { organization, position: new THREE.Vector3(side * 4.15, 1.7, z) };
+      group.add(frame, ...doors, sign); group.userData = { system, position: new THREE.Vector3(side * 4.15, 1.7, z) };
       group.traverse(item => { item.castShadow = true; item.receiveShadow = true; });
       shops.add(group); stores.push(group);
-      if (organization.status === 'active') {
+      if (system.status === 'active') {
         const glow = new THREE.PointLight(0x168cff, 7, 6, 2);
         glow.position.set(side * 3.9, 2, z); shops.add(glow);
       }
@@ -202,9 +202,9 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   }
 
   function enterNearby(target = nearby) {
-    if (target?.organization.status === 'active') {
+    if (target?.system.status === 'active') {
       controls.unlock();
-      openLogin(target.organization.id, target.organization.name, target.organization.publicUrl, ({ reason } = {}) => {
+      openLogin(target.system.id, target.system.name, target.system.publicUrl, ({ reason } = {}) => {
         if (!container.isConnected) return;
         if (reason === 'escape') start.hidden = false;
         else controls.lock();
@@ -252,19 +252,19 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
   searchForm.onsubmit = event => {
     event.preventDefault();
     const query = searchInput.value.trim().toLocaleLowerCase('pt-BR');
-    const floor = directory.floors.find(item => item.organizations.some(organization => organization.status === 'active' && organization.name.toLocaleLowerCase('pt-BR') === query));
-    const organization = floor?.organizations.find(item => item.status === 'active' && item.name.toLocaleLowerCase('pt-BR') === query);
-    if (!organization) {
+    const floor = directory.floors.find(item => item.systems.some(system => system.status === 'active' && system.name.toLocaleLowerCase('pt-BR') === query));
+    const system = floor?.systems.find(item => item.status === 'active' && item.name.toLocaleLowerCase('pt-BR') === query);
+    if (!system) {
       searchFeedback.textContent = 'Selecione uma loja disponível na lista de sugestões.';
       searchFeedback.classList.add('is-error');
       return;
     }
     if (floor.id !== floorId) {
-      searchFeedback.textContent = `${organization.name} fica no Piso ${floor.id}. Use a escada para chegar até lá.`;
+      searchFeedback.textContent = `${system.name} fica no Piso ${floor.id}. Use a escada para chegar até lá.`;
       searchFeedback.classList.remove('is-error');
       return;
     }
-    const store = stores.find(item => item.userData.organization.id === organization.id);
+    const store = stores.find(item => item.userData.system.id === system.id);
     if (!store) return;
     if (!controls.isLocked) controls.lock();
     lockedAtRunDestination = false;
@@ -274,9 +274,9 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
       store: store.userData,
       destination: new THREE.Vector3(store.userData.position.x > 0 ? .75 : -.75, 1.7, store.userData.position.z)
     };
-    searchFeedback.textContent = `Correndo até ${organization.name}...`;
+    searchFeedback.textContent = `Correndo até ${system.name}...`;
     searchFeedback.classList.remove('is-error');
-    prompt.textContent = `Indo até ${organization.name}...`;
+    prompt.textContent = `Indo até ${system.name}...`;
   };
 
   function resize() {
@@ -336,10 +336,10 @@ export function bindFirstPersonDirectory(app, openLogin, directory) {
     });
     const available = distance < 3.8;
     if (!available) nearby = null;
-    enterButton.disabled = !(nearby?.organization.status === 'active');
+    enterButton.disabled = !(nearby?.system.status === 'active');
     enterButton.hidden = enterButton.disabled;
     prompt.textContent = nearby
-      ? nearby.organization.status === 'active'
+      ? nearby.system.status === 'active'
         ? 'Espaço / Enter para entrar · Esc para sair da navegação'
         : 'Sala em construção · Esc para sair da navegação'
       : `Piso ${floorId} — use WASD e o mouse${controls.isLocked ? ' · Aperte ESC para sair' : ''}`;

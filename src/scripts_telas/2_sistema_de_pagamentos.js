@@ -21,7 +21,7 @@ function bindCheckout(app) {
         const checkout = await api(`/api/payments/${encodeURIComponent(button.dataset.checkout)}/checkout`);
         const pix = checkout.pix;
         box.innerHTML = `<button type="button" class="checkout-close" aria-label="Fechar">×</button>
-          <h2>Pagar fatura</h2><p><strong>${esc(checkout.organization)}</strong> — R$ ${money(checkout.value)}</p>
+          <h2>Pagar fatura</h2><p><strong>${esc(checkout.system)}</strong> — R$ ${money(checkout.value)}</p>
           ${pix?.encodedImage ? `<img class="pix-qr" src="data:image/png;base64,${esc(pix.encodedImage)}" alt="QR Code Pix">` : ''}
           ${pix?.payload ? `<label>Pix Copia e Cola</label><textarea readonly>${esc(pix.payload)}</textarea><button type="button" data-copy-pix>Copiar código Pix</button>` : ''}
           ${checkout.invoiceUrl ? `<a class="payment-link" href="${esc(checkout.invoiceUrl)}" target="_blank" rel="noopener noreferrer">Outros métodos de pagamento</a>` : ''}`;
@@ -37,16 +37,16 @@ function bindCheckout(app) {
 }
 
 export async function paymentsScreen(app) {
-  const administrator = state.session.user.perfil === 'admin' && state.session.organization.id === 'ORG_0000';
+  const administrator = state.session.user.perfil === 'admin' && state.session.system.id === 'SIS_0000';
   app.innerHTML = shell(`<div class="panel">
     ${administrator ? `<form id="plan-form" class="add-form">
       <h2 id="plan-form-title">Cadastrar plano mensal</h2>
-      <select name="organization" required><option value="">Carregando organizações...</option></select>
+      <select name="system" required><option value="">Carregando sistemas...</option></select>
       <input name="name" placeholder="Cliente" required><input name="cpfCnpj" placeholder="CPF/CNPJ" required>
       <input name="email" type="email" placeholder="E-mail"><input name="value" type="number" min="5" step=".01" placeholder="Mensalidade" required>
       <input name="nextDueDate" type="date" required><button>Salvar plano</button><button type="button" id="cancel-edit" hidden>Cancelar edição</button>
     </form><form id="extra-form" class="add-form">
-      <h2>Adicionar serviço extra</h2><select name="organization" required><option value="">Carregando organizações...</option></select>
+      <h2>Adicionar serviço extra</h2><select name="system" required><option value="">Carregando sistemas...</option></select>
       <input name="name" placeholder="Cliente" required><input name="cpfCnpj" placeholder="CPF/CNPJ" required><input name="email" type="email" placeholder="E-mail">
       <input name="serviceDescription" placeholder="Descrição do serviço" required><input name="value" type="number" min="5" step=".01" placeholder="Valor único" required>
       <input name="dueDate" type="date" required><button>Gerar fatura avulsa</button>
@@ -63,14 +63,14 @@ export async function paymentsScreen(app) {
     form.nextDueDate.value = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
     extraForm.dueDate.value = form.nextDueDate.value;
     try {
-      const data = await api('/api/organizations');
-      const options = '<option value="">Selecione uma organização</option>' + data.organizations.filter(org => org.id !== 'ORG_0000').map(org => `<option value="${esc(org.id)}">${esc(org.id)} — ${esc(org.name)}</option>`).join('');
-      form.organization.innerHTML = options; extraForm.organization.innerHTML = options;
+      const data = await api('/api/systems');
+      const options = '<option value="">Selecione um sistema</option>' + data.systems.filter(sis => sis.id !== 'SIS_0000').map(sis => `<option value="${esc(sis.id)}">${esc(sis.id)} — ${esc(sis.name)}</option>`).join('');
+      form.system.innerHTML = options; extraForm.system.innerHTML = options;
     } catch (error) { app.querySelector('#pay-error').textContent = error.message; }
     form.onsubmit = async event => {
       event.preventDefault();
       const body = Object.fromEntries(new FormData(form));
-      body.organization = form.organization.value;
+      body.system = form.system.value;
       body.value = Number(body.value);
       const id = form.dataset.planId;
       try {
@@ -93,19 +93,19 @@ export async function paymentsScreen(app) {
     const plans = data.plans || [];
     const extras = data.extras || [];
     const history = data.history || [];
-    app.querySelector('#payment-history').innerHTML = `<section class="org"><h2>Histórico financeiro</h2>${history.map(payment => `<div class="user"><strong>${esc(payment.organization)}</strong><span>Vencimento: ${esc(payment.dueDate || '—')}</span><span>R$ ${money(payment.value)}</span><span class="badge">${esc(payment.status)}</span></div>`).join('') || '<p>Nenhum pagamento registrado no histórico.</p>'}</section>`;
-    app.querySelector('#plans').innerHTML = `${plans.map(plan => `<section class="org">
-      <div class="org-head"><div><h2>${esc(plan.externalReference)}</h2><p>Plano mensal — R$ ${money(plan.value)} | Próximo vencimento: ${esc(plan.nextDueDate || '—')} | ${esc(plan.status)}</p></div>
+    app.querySelector('#payment-history').innerHTML = `<section class="sis"><h2>Histórico financeiro</h2>${history.map(payment => `<div class="user"><strong>${esc(payment.system)}</strong><span>Vencimento: ${esc(payment.dueDate || '—')}</span><span>R$ ${money(payment.value)}</span><span class="badge">${esc(payment.status)}</span></div>`).join('') || '<p>Nenhum pagamento registrado no histórico.</p>'}</section>`;
+    app.querySelector('#plans').innerHTML = `${plans.map(plan => `<section class="sis">
+      <div class="sis-head"><div><h2>${esc(plan.externalReference)}</h2><p>Plano mensal — R$ ${money(plan.value)} | Próximo vencimento: ${esc(plan.nextDueDate || '—')} | ${esc(plan.status)}</p></div>
       ${administrator ? `<button type="button" data-edit-plan="${esc(plan.id)}" data-value="${esc(plan.value)}" data-due="${esc(plan.nextDueDate)}">Editar plano</button>` : ''}</div>
       <div class="table"><h3>Faturas</h3>${(plan.payments?.data || []).map(payment => `<div class="user"><strong>${esc(payment.dueDate)}</strong><span>R$ ${money(payment.value)}</span><span class="badge">${esc(payment.status)}</span>${payable.has(payment.status) ? `<button type="button" data-checkout="${esc(payment.id)}">Pagar agora</button>` : ''}</div>`).join('') || '<p>Nenhuma fatura gerada ainda.</p>'}</div>
     </section>`).join('') || '<p>Nenhum plano mensal cadastrado.</p>'}
-    <section class="org"><h2>Serviços extras</h2>${extras.map(payment => `<div class="user"><strong>${esc(String(payment.description || '').replace('SERVIÇO EXTRA — ', ''))}</strong><span>${esc(payment.externalReference)}</span><span>Vencimento: ${esc(payment.dueDate)}</span><span>R$ ${money(payment.value)}</span><span class="badge">${esc(payment.status)}</span>${payable.has(payment.status) ? `<button type="button" data-checkout="${esc(payment.id)}">Pagar agora</button>` : ''}</div>`).join('') || '<p>Nenhum serviço extra faturado.</p>'}</section>`;
+    <section class="sis"><h2>Serviços extras</h2>${extras.map(payment => `<div class="user"><strong>${esc(String(payment.description || '').replace('SERVIÇO EXTRA — ', ''))}</strong><span>${esc(payment.externalReference)}</span><span>Vencimento: ${esc(payment.dueDate)}</span><span>R$ ${money(payment.value)}</span><span class="badge">${esc(payment.status)}</span>${payable.has(payment.status) ? `<button type="button" data-checkout="${esc(payment.id)}">Pagar agora</button>` : ''}</div>`).join('') || '<p>Nenhum serviço extra faturado.</p>'}</section>`;
     bindCheckout(app);
     if (form) app.querySelectorAll('[data-edit-plan]').forEach(button => {
       button.onclick = () => {
         form.dataset.planId = button.dataset.editPlan;
-        form.organization.value = button.closest('.org').querySelector('h2').textContent;
-        form.organization.disabled = true;
+        form.system.value = button.closest('.sis').querySelector('h2').textContent;
+        form.system.disabled = true;
         form.name.required = false; form.cpfCnpj.required = false;
         form.value.value = button.dataset.value; form.nextDueDate.value = button.dataset.due;
         app.querySelector('#plan-form-title').textContent = 'Editar plano mensal';

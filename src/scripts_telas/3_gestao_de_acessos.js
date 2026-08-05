@@ -10,8 +10,8 @@ export async function accessScreen(app) {
   app.innerHTML = shell('<div class="panel"><p>Carregando acessos...</p></div>', 'Gestão de Acessos');
   bindShell();
   try {
-    const data = await api('/api/access/organizations');
-    render(app, data.organizations);
+    const data = await api('/api/access/systems');
+    render(app, data.systems);
   } catch (error) {
     app.querySelector('.panel').innerHTML = `<p class="error">${esc(error.message)}</p>`;
   }
@@ -26,41 +26,41 @@ function levelOptions(selected = 1) {
   return [1, 2].map(level => `<option value="${level}" ${Number(selected) === level ? 'selected' : ''}>Nível ${level}</option>`).join('');
 }
 
-function render(app, organizations) {
+function render(app, systems) {
   const admin = state.session.user.perfil === 'admin';
-  const organizationOptions = organizations
-    .map(org => `<option value="${esc(org.id)}">${esc(org.id)} — ${esc(org.name)}</option>`).join('');
+  const systemOptions = systems
+    .map(sis => `<option value="${esc(sis.id)}">${esc(sis.id)} — ${esc(sis.name)}</option>`).join('');
   const addForm = admin ? `
     <form id="add" class="add-form">
       <h2>Adicionar login</h2>
-      <select name="organization" required><option value="">Selecione uma organização</option>${organizationOptions}</select>
+      <select name="system" required><option value="">Selecione um sistema</option>${systemOptions}</select>
       <input name="login" placeholder="novo.login" required>
       <select name="profile">${profileOptions('gerente')}</select>
       <select name="tipo" aria-label="Tipo de acesso">${levelOptions(1)}</select>
       <button>Adicionar</button>
     </form>` : '';
 
-  const cards = organizations.map(org => {
-    const organizationControl = org.id === 'ORG_0000'
+  const cards = systems.map(sis => {
+    const systemControl = sis.id === 'SIS_0000'
       ? '<span class="badge">Administrativa</span>'
       : admin
-        ? `<button data-org-status="${esc(org.id)}" data-active="${!org.active}">${org.active ? 'Inativar organização' : 'Ativar organização'}</button>`
-        : `<span class="badge">${org.active ? 'Ativa' : 'Inativa'}</span>`;
-    const users = Object.entries(org.logins).map(([login, user]) => {
+        ? `<button data-sis-status="${esc(sis.id)}" data-active="${!sis.active}">${sis.active ? 'Inativar sistema' : 'Ativar sistema'}</button>`
+        : `<span class="badge">${sis.active ? 'Ativa' : 'Inativa'}</span>`;
+    const users = Object.entries(sis.logins).map(([login, user]) => {
       const protectedAdmin = user.perfil === 'admin';
       const disableProfile = !admin || protectedAdmin;
       return `<div class="user">
         <strong>${esc(login)}</strong>
-        <select data-profile="${esc(org.id)}|${esc(login)}" ${disableProfile ? 'disabled' : ''}>${profileOptions(user.perfil)}</select>
-        <select data-level="${esc(org.id)}|${esc(login)}" ${!admin ? 'disabled' : ''}>${levelOptions(user.nivel_acesso || (protectedAdmin ? 2 : 1))}</select>
-        <button data-toggle="${esc(org.id)}|${esc(login)}" data-active="${user.status_ativo_login !== true}">${user.status_ativo_login === true ? 'Inativar' : 'Ativar'}</button>
-        ${admin ? `<button class="danger" data-delete="${esc(org.id)}|${esc(login)}">Excluir</button>` : ''}
+        <select data-profile="${esc(sis.id)}|${esc(login)}" ${disableProfile ? 'disabled' : ''}>${profileOptions(user.perfil)}</select>
+        <select data-level="${esc(sis.id)}|${esc(login)}" ${!admin ? 'disabled' : ''}>${levelOptions(user.nivel_acesso || (protectedAdmin ? 2 : 1))}</select>
+        <button data-toggle="${esc(sis.id)}|${esc(login)}" data-active="${user.status_ativo_login !== true}">${user.status_ativo_login === true ? 'Inativar' : 'Ativar'}</button>
+        ${admin ? `<button class="danger" data-delete="${esc(sis.id)}|${esc(login)}">Excluir</button>` : ''}
       </div>`;
     }).join('') || '<p>Nenhum login cadastrado.</p>';
-    return `<article class="org"><div class="org-head"><div><h2>${esc(org.name)}</h2><small>${esc(org.id)}</small></div>${organizationControl}</div><div class="table">${users}</div></article>`;
+    return `<article class="sis"><div class="sis-head"><div><h2>${esc(sis.name)}</h2><small>${esc(sis.id)}</small></div>${systemControl}</div><div class="table">${users}</div></article>`;
   }).join('');
 
-  app.querySelector('.panel').outerHTML = `<div class="panel">${addForm}<div id="orgs">${cards}</div><p id="feedback"></p></div>`;
+  app.querySelector('.panel').outerHTML = `<div class="panel">${addForm}<div id="systems">${cards}</div><p id="feedback"></p></div>`;
   bindActions(app);
 }
 
@@ -78,45 +78,45 @@ function bindActions(app) {
 
   app.querySelectorAll('[data-toggle]').forEach(button => {
     button.onclick = () => {
-      const [organization, login] = button.dataset.toggle.split('|');
-      act(`/api/access/organizations/${organization}/logins/${encodeURIComponent(login)}`, { active: button.dataset.active === 'true' });
+      const [system, login] = button.dataset.toggle.split('|');
+      act(`/api/access/systems/${system}/logins/${encodeURIComponent(login)}`, { active: button.dataset.active === 'true' });
     };
   });
   app.querySelectorAll('[data-delete]').forEach(button => {
     button.onclick = () => {
-      const [organization, login] = button.dataset.delete.split('|');
-      if (confirm(`Excluir ${login}?`)) act(`/api/access/organizations/${organization}/logins/${encodeURIComponent(login)}`, { remove: true });
+      const [system, login] = button.dataset.delete.split('|');
+      if (confirm(`Excluir ${login}?`)) act(`/api/access/systems/${system}/logins/${encodeURIComponent(login)}`, { remove: true });
     };
   });
   app.querySelectorAll('[data-profile]').forEach(select => {
     select.onchange = () => {
-      const [organization, login] = select.dataset.profile.split('|');
-      act(`/api/access/organizations/${organization}/logins/${encodeURIComponent(login)}`, { perfil: select.value });
+      const [system, login] = select.dataset.profile.split('|');
+      act(`/api/access/systems/${system}/logins/${encodeURIComponent(login)}`, { perfil: select.value });
     };
   });
   app.querySelectorAll('[data-level]').forEach(select => {
     select.onchange = () => {
-      const [organization, login] = select.dataset.level.split('|');
-      act(`/api/access/organizations/${organization}/logins/${encodeURIComponent(login)}`, { tipo: Number(select.value) });
+      const [system, login] = select.dataset.level.split('|');
+      act(`/api/access/systems/${system}/logins/${encodeURIComponent(login)}`, { tipo: Number(select.value) });
     };
   });
-  app.querySelectorAll('[data-org-status]').forEach(button => {
-    button.onclick = () => act(`/api/access/organizations/${button.dataset.orgStatus}/status`, { active: button.dataset.active === 'true' });
+  app.querySelectorAll('[data-sis-status]').forEach(button => {
+    button.onclick = () => act(`/api/access/systems/${button.dataset.sisStatus}/status`, { active: button.dataset.active === 'true' });
   });
 
   const add = app.querySelector('#add');
   if (add) {
     const synchronizeProfile = () => {
-      const administrative = add.organization.value === 'ORG_0000';
+      const administrative = add.system.value === 'SIS_0000';
       add.profile.value = administrative ? 'admin' : (add.profile.value === 'admin' ? 'gerente' : add.profile.value);
       [...add.profile.options].forEach(option => { option.disabled = administrative ? option.value !== 'admin' : option.value === 'admin'; });
     };
-    add.organization.onchange = synchronizeProfile;
+    add.system.onchange = synchronizeProfile;
     synchronizeProfile();
     add.onsubmit = event => {
       event.preventDefault();
       const values = Object.fromEntries(new FormData(add));
-      act(`/api/access/organizations/${values.organization}/logins/${encodeURIComponent(values.login.toLowerCase())}`, { perfil: values.profile, tipo: Number(values.tipo), active: true });
+      act(`/api/access/systems/${values.system}/logins/${encodeURIComponent(values.login.toLowerCase())}`, { perfil: values.profile, tipo: Number(values.tipo), active: true });
     };
   }
 }

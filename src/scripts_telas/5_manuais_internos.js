@@ -10,12 +10,12 @@ const esc = value => {
 const publicManuals = [{
   title: 'Guia Público de Implantação da API GateGuard',
   version: '1.0',
-  summary: 'Material entregue aos desenvolvedores das organizações para integração backend-to-backend.',
+  summary: 'Material entregue aos desenvolvedores dos sistemas para integração backend-to-backend.',
   url: `${import.meta.env.BASE_URL}docs/Manual_Implantacao_API_GateGuard.pdf`
 }];
 
 function assertOwner() {
-  return state.session?.organization?.id === 'ORG_0000';
+  return state.session?.system?.id === 'SIS_0000';
 }
 
 function manualHtml(manual) {
@@ -36,7 +36,7 @@ function manualHtml(manual) {
 export async function manualsScreen(app) {
   if (!assertOwner()) return;
   app.innerHTML = shell(`<div class="manuals-workspace">
-    <section id="manual-catalog"><div class="manuals-intro"><div><span>BASE DE CONHECIMENTO</span><h2>Manuais Internos</h2><p>Fonte de verdade para decisões de produto, segurança, implantação e operação.</p><div class="manual-legend"><b class="is-internal">INTERNO · somente ORG_0000/admin</b><b class="is-public">PÚBLICO · pode ser compartilhado</b></div></div><div class="manuals-rule"><b>Regra de visibilidade</b><p>Este ambiente inclui documentos internos e referências públicas. A área pública nunca exibe documentos internos.</p></div></div><h2 class="manual-group-title internal-title">Documentos internos protegidos</h2><div id="internal-manual-list" class="manual-grid"><p>Carregando manuais...</p></div><h2 class="manual-group-title public-title">Manuais públicos disponíveis para consulta interna</h2><div id="public-manual-list" class="manual-grid"></div></section>
+    <section id="manual-catalog"><div class="manuals-intro"><div><span>BASE DE CONHECIMENTO</span><h2>Manuais Internos</h2><p>Fonte de verdade para decisões de produto, segurança, implantação e operação.</p><div class="manual-legend"><b class="is-internal">INTERNO · somente SIS_0000/admin</b><b class="is-public">PÚBLICO · pode ser compartilhado</b></div></div><div class="manuals-rule"><b>Regra de visibilidade</b><p>Este ambiente inclui documentos internos e referências públicas. A área pública nunca exibe documentos internos.</p></div></div><h2 class="manual-group-title internal-title">Documentos internos protegidos</h2><div id="internal-manual-list" class="manual-grid"><p>Carregando manuais...</p></div><h2 class="manual-group-title public-title">Manuais públicos disponíveis para consulta interna</h2><div id="public-manual-list" class="manual-grid"></div></section>
     <section id="manual-viewer" hidden><div class="manual-toolbar"><button type="button" id="manual-back">← Todos os manuais</button><div><button type="button" id="manual-print">Imprimir</button><button type="button" id="manual-download">Baixar PDF oficial</button></div></div><div id="manual-content"></div></section>
   </div>`, 'Manuais Internos');
   bindShell();
