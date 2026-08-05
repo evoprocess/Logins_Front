@@ -39,8 +39,8 @@ export async function organizationsScreen(app) {
   </form>
   <section class="form-section developer-internal-manual">
     <details>
-      <summary><strong>Manual interno do cadastro de organizações · ORG_0000</strong></summary>
-      <p>Este fluxo é exclusivo dos desenvolvedores/administradores autenticados na <code>ORG_0000</code>.</p>
+      <summary><strong>Orientações rápidas do cadastro de organizações · ORG_0000</strong></summary>
+      <p>Este resumo operacional é exclusivo da <code>ORG_0000</code>. Os documentos normativos, versões e registros de mudanças ficam no menu <strong>Manuais Internos</strong>.</p>
       <ol>
         <li>O sistema calcula o próximo identificador no formato <code>ORG_XXXX</code>, preservando uma numeração exclusiva de quatro algarismos.</li>
         <li>O Firebase da organização deve estar configurado no Render do backend Gate Guard, serviço <code>Logins_Back</code>, pela variável <code>DADOS_FIREBASE_ORG_XXXX</code>.</li>
