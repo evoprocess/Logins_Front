@@ -21,7 +21,7 @@ export async function systemsScreen(app) {
       <h2 class="form-section-title">Dados do sistema</h2><section class="form-section">
       <div class="system-left-column"><div class="system-fields"><input name="systemEmail" type="hidden" value="${esc(SYSTEM_EMAIL)}"><input name="systemUrl" type="hidden" value="${esc(SYSTEM_URL)}"><label>ID do Sistema<input name="system" readonly></label></div>
       <div class="system-main-fields"><label>Nome do Sistema*<input name="name" required maxlength="120" autocapitalize="characters"></label>
-        <div class="phone-field"><label>Telefone*<input name="phone" required inputmode="tel"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Whatsapp</label></div>
+        <div class="phone-field"><label>Telefone*<input name="phone" required inputmode="numeric" maxlength="14" placeholder="(00)00000-0000" pattern="\(\d{2}\)\d{4,5}-\d{4}" title="Informe DDD e telefone com 8 ou 9 dígitos"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Whatsapp</label></div>
       </div></div><div class="document-group">
         <div class="document-type-field"><span>Tipo de documento*</span><div class="document-type-selector" role="radiogroup" aria-label="Tipo de documento"><label><input type="radio" name="documentType" value="CPF" required><span>CPF</span></label><label><input type="radio" name="documentType" value="CNPJ" required checked><span>CNPJ</span></label></div></div>
         <label><span id="system-document-label">CNPJ*</span><input name="cpfCnpj" required inputmode="numeric"></label>
@@ -282,7 +282,20 @@ export async function systemsScreen(app) {
         .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3/$4')
         .replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, '$1.$2.$3/$4-$5');
     };
+    const formatPhone = value => {
+      const digits = String(value || '').replace(/\D/g, '').slice(0, 11);
+      if (!digits) return '';
+      if (digits.length <= 2) return `(${digits}`;
+      const ddd = digits.slice(0, 2);
+      const number = digits.slice(2);
+      if (number.length <= 4) return `(${ddd})${number}`;
+      const split = number.length <= 8 ? 4 : 5;
+      return `(${ddd})${number.slice(0, split)}-${number.slice(split)}`;
+    };
     function formatDocument(value, type) { return type === 'CNPJ' ? formatCnpj(value) : formatCpf(value); }
+    form.phone.addEventListener('input', () => {
+      form.phone.value = formatPhone(form.phone.value);
+    });
     form.cpfCnpj.addEventListener('input', () => {
       form.cpfCnpj.value = formatDocument(form.cpfCnpj.value, form.documentType.value);
     });
