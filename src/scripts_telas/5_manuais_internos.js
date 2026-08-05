@@ -1,4 +1,4 @@
-import { api, state, shell, bindShell } from '../main.js';
+import { api, state, shell, bindShell, PUBLIC_IMAGES_URL } from '../main.js';
 import '../manuals.css';
 
 const esc = value => {
@@ -23,7 +23,8 @@ function manualHtml(manual) {
   const sections = manual.sections.map(section => `<section id="manual-${esc(section.id)}" class="manual-section"><h2>${esc(section.title)}</h2>${section.html}</section>`).join('');
   const changes = manual.changes.map(change => `<tr><td>v${esc(change.version)}</td><td>${esc(change.date)}</td><td>${esc(change.description)}</td></tr>`).join('');
   return `<article class="manual-document">
-    <header class="manual-cover"><span>GATEGUARD · MANUAL INTERNO</span><h1>${esc(manual.title)}</h1><p>${esc(manual.subtitle)}</p><div><b>Versão ${esc(manual.version)}</b><small>Atualizado em ${esc(manual.updatedAt)}</small></div></header>
+    <header class="manual-cover"><div class="manual-cover-art" aria-hidden="true"><i></i><i></i><i></i></div><div class="manual-brand"><img src="${esc(PUBLIC_IMAGES_URL)}/gateguard_logo.png" alt="GateGuard"><span>DOCUMENTAÇÃO OFICIAL · USO INTERNO</span></div><div class="manual-cover-copy"><small>GATEGUARD · GOVERNANÇA E CONHECIMENTO</small><h1>${esc(manual.title)}</h1><p>${esc(manual.subtitle)}</p></div><div class="manual-cover-version"><b>Versão ${esc(manual.version)}</b><span>Atualizado em ${esc(manual.updatedAt)}</span><span>${esc(manual.status)}</span></div></header>
+    <div class="manual-running-head"><img src="${esc(PUBLIC_IMAGES_URL)}/gateguard_logo.png" alt=""><span>${esc(manual.title)}</span><b>v${esc(manual.version)}</b></div>
     <section class="manual-meta"><div><small>Status</small><strong>${esc(manual.status)}</strong></div><div><small>Público interno</small><strong>${esc(manual.audience)}</strong></div></section>
     <section class="manual-toc"><h2>Sumário</h2><ol>${toc}<li><a href="#manual-history">Histórico de versões</a></li></ol></section>
     ${sections}
