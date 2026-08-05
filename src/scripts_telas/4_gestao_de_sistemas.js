@@ -28,13 +28,13 @@ export async function systemsScreen(app) {
         <label id="corporate-name-field">Razão social*<input name="corporateName" maxlength="160" required></label>
       </div></section>
       <h2 class="form-section-title">Dados do administrador</h2><section class="form-section">
-      <label>Nome do Administrador*<input name="administratorName" required maxlength="120" autocapitalize="characters"></label><label>CPF*<input name="administratorCpf" required inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="Somente 11 números"></label>
+      <label>Nome do Administrador*<input name="administratorName" required maxlength="120" autocapitalize="characters"></label><label>CPF*<input name="administratorCpf" required inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></label>
       <label>Cargo*<input name="administratorRole" required maxlength="100" autocapitalize="characters"></label><label>E-mail administrativo*<input name="adminEmail" type="email" required></label>
       <details><summary>Outros destinatários de e-mail</summary>
         <label>E-mail de acessos<input name="accessEmail" type="email"></label><label>E-mail financeiro<input name="financialEmail" type="email"></label><label>E-mail de comunicados<input name="communicationsEmail" type="email"></label>
       </details>
-      <div class="credential-fields"><label>Login<input value="gestor" readonly></label><label>Senha Temporária*<input name="temporaryPassword" readonly required></label></div>
-      <div class="registration-actions"><button type="button" id="generate-password">Gerar Senha</button><button type="submit" title="Ao cadastrar o sistema o acesso será enviado para os e-mails administrativo e de acessos">Cadastrar Sistema</button></div></section>
+      <div class="credential-fields"><label>Login<input value="gestor" readonly></label><label>Senha*<input name="temporaryPassword" type="password" required minlength="8" maxlength="64" pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,64}" autocomplete="new-password" title="Use de 8 a 64 caracteres, com pelo menos uma letra e um número"></label></div>
+      <div class="registration-actions"><button type="button" id="generate-password">Gerar Senha</button><button type="submit" id="register-system-button" disabled title="Preencha corretamente todos os campos obrigatórios">Cadastrar Sistema</button></div></section>
     </fieldset><p id="registration-feedback" class="error"></p>
   </form>
   <section class="form-section developer-internal-manual">
@@ -97,7 +97,7 @@ export async function systemsScreen(app) {
   bindShell();
 
   try {
-    const [readiness, systemData] = await Promise.all([api('/api/system-registration/readiness'), api('/api/systems')]);
+    const [readiness, systemData] = await Promise.all([api('/api/system-registration/readiness'), api('/api/access/systems')]);
     const form = app.querySelector('#system-registration');
     form.hidden = false; form.system.value = readiness.id;
     app.querySelector('#registration-status').innerHTML = readiness.configured
@@ -113,9 +113,10 @@ export async function systemsScreen(app) {
     };
     const ready = readiness.configured;
     app.querySelector('#system-fields').disabled = !ready;
-    app.querySelector('#generate-password').onclick = async () => { form.temporaryPassword.value = (await api('/api/system-registration/password')).password; };
+    app.querySelector('#generate-password').onclick = async () => { form.temporaryPassword.value = (await api('/api/system-registration/password')).password; form.temporaryPassword.dispatchEvent(new Event('input', { bubbles: true })); };
     const deleteSelect = app.querySelector('#delete-system');
     const removable = systemData.systems.filter(item => item.id !== 'SIS_0000');
+    const integratedSystems = removable.filter(item => item.sistema_implantado === true);
     const integrationSection = app.querySelector('#api-integration');
     const integrationSelect = app.querySelector('#integration-system');
     const integrationDetails = app.querySelector('#integration-details');
@@ -125,7 +126,7 @@ export async function systemsScreen(app) {
     const integrationKeyPreview = app.querySelector('#integration-key-preview');
     const generateKey = app.querySelector('#generate-integration-key');
     const revokeKey = app.querySelector('#revoke-integration-key');
-    integrationSelect.innerHTML = '<option value="">Selecione um sistema</option>' + removable.map(item => `<option value="${esc(item.id)}">${esc(item.id)} — ${esc(publicSystemNames.get(item.id) || item.name || item.id)}</option>`).join('');
+    integrationSelect.innerHTML = '<option value="">Selecione um sistema</option>' + integratedSystems.map(item => `<option value="${esc(item.id)}">${esc(item.id)} — ${esc(publicSystemNames.get(item.id) || item.name || item.id)}</option>`).join('');
     integrationSection.hidden = false;
     const loadIntegration = async () => {
       const system = integrationSelect.value;
@@ -245,9 +246,9 @@ export async function systemsScreen(app) {
     const synchronizeDocumentType = () => {
       const isCnpj = form.documentType.value === 'CNPJ';
       app.querySelector('#system-document-label').textContent = `${isCnpj ? 'CNPJ' : 'CPF'}*`;
-      form.cpfCnpj.placeholder = isCnpj ? 'Somente 14 números' : 'Somente 11 números';
-      form.cpfCnpj.maxLength = isCnpj ? 14 : 11;
-      form.cpfCnpj.value = form.cpfCnpj.value.replace(/\D/g, '').slice(0, isCnpj ? 14 : 11);
+      form.cpfCnpj.placeholder = isCnpj ? '00.000.000/0000-00' : '000.000.000-00';
+      form.cpfCnpj.maxLength = isCnpj ? 18 : 14;
+      form.cpfCnpj.value = formatDocument(form.cpfCnpj.value, isCnpj ? 'CNPJ' : 'CPF');
       form.corporateName.required = isCnpj;
       form.corporateName.disabled = !isCnpj;
       app.querySelector('#corporate-name-field').classList.toggle('is-invisible', !isCnpj);
@@ -256,23 +257,51 @@ export async function systemsScreen(app) {
     };
     const uppercaseFields = [form.name, form.administratorName, form.administratorRole];
     uppercaseFields.forEach(input => { input.oninput = () => { input.value = input.value.toLocaleUpperCase('pt-BR'); }; });
+    const formatCpf = value => {
+      const digits = String(value || '').replace(/\D/g, '').slice(0, 11);
+      return digits
+        .replace(/^(\d{3})(\d)/, '$1.$2')
+        .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+        .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+    };
+    const formatCnpj = value => {
+      const digits = String(value || '').replace(/\D/g, '').slice(0, 14);
+      return digits
+        .replace(/^(\d{2})(\d)/, '$1.$2')
+        .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+        .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3/$4')
+        .replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, '$1.$2.$3/$4-$5');
+    };
+    function formatDocument(value, type) { return type === 'CNPJ' ? formatCnpj(value) : formatCpf(value); }
     form.cpfCnpj.addEventListener('input', () => {
-      const maximum = form.documentType.value === 'CNPJ' ? 14 : 11;
-      form.cpfCnpj.value = form.cpfCnpj.value.replace(/\D/g, '').slice(0, maximum);
+      form.cpfCnpj.value = formatDocument(form.cpfCnpj.value, form.documentType.value);
     });
     form.administratorCpf.addEventListener('input', () => {
-      form.administratorCpf.value = form.administratorCpf.value.replace(/\D/g, '').slice(0, 11);
+      form.administratorCpf.value = formatCpf(form.administratorCpf.value);
     });
     const validateSystemDocument = bindDocumentValidation(form.cpfCnpj, () => form.documentType.value);
-    bindDocumentValidation(form.administratorCpf, () => 'CPF');
+    const validateAdministratorCpf = bindDocumentValidation(form.administratorCpf, () => 'CPF');
+    const registrationSubmit = app.querySelector('#register-system-button');
+    const synchronizeRegistration = () => {
+      validateSystemDocument();
+      validateAdministratorCpf();
+      registrationSubmit.disabled = !form.checkValidity();
+      registrationSubmit.title = registrationSubmit.disabled
+        ? 'Preencha corretamente todos os campos obrigatórios'
+        : 'Cadastrar sistema e enviar os dados de acesso';
+    };
+    form.addEventListener('input', synchronizeRegistration);
+    form.addEventListener('change', synchronizeRegistration);
+    form.addEventListener('focusout', synchronizeRegistration);
     form.querySelectorAll('input[name="documentType"]').forEach(input => { input.onchange = synchronizeDocumentType; });
     synchronizeDocumentType();
+    synchronizeRegistration();
     form.onsubmit = async event => {
       event.preventDefault();
       const values = Object.fromEntries(new FormData(form));
       values.whatsapp = form.whatsapp.checked;
       const feedback = app.querySelector('#registration-feedback');
-      const submit = form.querySelector('button[type="submit"]');
+      const submit = registrationSubmit;
       submit.disabled = true;
       feedback.textContent = 'Iniciando o cadastro...'; feedback.className = 'registration-progress';
       try {
@@ -287,7 +316,7 @@ export async function systemsScreen(app) {
         const result = status.result;
         feedback.textContent = `${result.system} cadastrada. Acesso enviado para ${result.recipients.join(', ')}.`; feedback.className = 'notice';
         form.querySelector('fieldset').disabled = true;
-      } catch (error) { feedback.textContent = error.message; feedback.className = 'error'; submit.disabled = false; }
+      } catch (error) { feedback.textContent = error.message; feedback.className = 'error'; synchronizeRegistration(); }
     };
   } catch (error) { app.querySelector('#registration-status').innerHTML = `<p class="error">${esc(error.message)}</p>`; }
 }
