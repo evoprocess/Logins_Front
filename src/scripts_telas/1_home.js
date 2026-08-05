@@ -20,7 +20,7 @@ export async function homeScreen(app) {
       <div class="admin-identity"><small>Sessão administrativa</small><strong>${esc(state.session.user.name)}</strong><span>SIS_0000 · admin</span></div>
     </section>
     <section class="admin-metrics" aria-label="Resumo administrativo">
-      <article><span>Sistemas</span><strong id="admin-sis-count">—</strong><small>cadastradas no GateGuard</small></article>
+      <article><span>Sistemas</span><strong id="admin-sis-count">—</strong><small>implantados no GateGuard</small></article>
       <article><span>Governança</span><strong>Central</strong><small>pagamentos e bloqueios</small></article>
       <article><span>Integrações</span><strong>API</strong><small>credenciais por sistema</small></article>
     </section>
@@ -32,8 +32,8 @@ export async function homeScreen(app) {
   bindShell();
   app.querySelectorAll('[data-admin-page]').forEach(button => { button.onclick = () => navigate(button.dataset.adminPage); });
   try {
-    const data = await api('/api/systems');
-    app.querySelector('#admin-sis-count').textContent = data.systems.filter(system => system.id !== 'SIS_0000').length;
+    const data = await api('/api/access/systems');
+    app.querySelector('#admin-sis-count').textContent = data.systems.filter(system => system.id !== 'SIS_0000' && system.sistema_implantado === true).length;
   } catch {
     app.querySelector('#admin-sis-count').textContent = '!';
   }
