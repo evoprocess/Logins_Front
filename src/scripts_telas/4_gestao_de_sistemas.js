@@ -270,7 +270,7 @@ export async function systemsScreen(app) {
         do {
           await new Promise(resolve => setTimeout(resolve, 2000));
           status = await api(`/api/system-registration/jobs/${encodeURIComponent(jobId)}`);
-          feedback.innerHTML = `<strong>Criação em andamento</strong><span>${esc(status.message)}</span><small>Este processo pode levar até 15 minutos. Não feche esta página.</small>`;
+          feedback.innerHTML = `<strong>Criação em andamento</strong><span>${esc(status.message)}</span><small>A etapa atual será interrompida rapidamente se houver erro de permissão. Não feche esta página.</small>`;
         } while (status.state === 'processing');
         if (status.state === 'failed') throw new Error(status.error || 'Não foi possível concluir o cadastro.');
         const result = status.result;
