@@ -33,8 +33,8 @@ export async function systemsScreen(app) {
       <details><summary>Outros destinatários de e-mail</summary>
         <label>E-mail de acessos<input name="accessEmail" type="email"></label><label>E-mail financeiro<input name="financialEmail" type="email"></label><label>E-mail de comunicados<input name="communicationsEmail" type="email"></label>
       </details>
-      <div class="credential-fields"><label>Login<input value="gestor" readonly></label><label>Senha*<input name="temporaryPassword" type="password" required minlength="8" maxlength="64" pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,64}" autocomplete="new-password" title="Use de 8 a 64 caracteres, com pelo menos uma letra e um número"></label></div>
-      <div class="registration-actions"><button type="button" id="generate-password">Gerar Senha</button><button type="submit" id="register-system-button" disabled title="Preencha corretamente todos os campos obrigatórios">Cadastrar Sistema</button></div></section>
+      <div class="credential-fields"><label>Login<input value="gestor" readonly></label><label>Senha*<span class="registration-password-control"><input name="temporaryPassword" type="password" required minlength="8" maxlength="64" pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,64}" autocomplete="new-password" title="Use de 8 a 64 caracteres, com pelo menos uma letra e um número"><button type="button" id="toggle-registration-password" aria-label="Exibir senha" title="Exibir senha" aria-pressed="false"><span aria-hidden="true">&#128065;</span></button><button type="button" id="generate-password" aria-label="Gerar nova senha" title="Gerar nova senha"><span aria-hidden="true">&#8635;</span></button></span></label></div>
+      <div class="registration-actions"><button type="submit" id="register-system-button" disabled title="Preencha corretamente todos os campos obrigatórios">Cadastrar Sistema</button></div></section>
     </fieldset><p id="registration-feedback" class="error"></p>
   </form>
   <section class="form-section developer-internal-manual">
@@ -113,7 +113,17 @@ export async function systemsScreen(app) {
     };
     const ready = readiness.configured;
     app.querySelector('#system-fields').disabled = !ready;
-    app.querySelector('#generate-password').onclick = async () => { form.temporaryPassword.value = (await api('/api/system-registration/password')).password; form.temporaryPassword.dispatchEvent(new Event('input', { bubbles: true })); };
+    const passwordInput = form.temporaryPassword;
+    const passwordToggle = app.querySelector('#toggle-registration-password');
+    passwordToggle.onclick = () => {
+      const showing = passwordInput.type === 'text';
+      passwordInput.type = showing ? 'password' : 'text';
+      passwordToggle.setAttribute('aria-pressed', String(!showing));
+      passwordToggle.setAttribute('aria-label', showing ? 'Exibir senha' : 'Ocultar senha');
+      passwordToggle.title = showing ? 'Exibir senha' : 'Ocultar senha';
+      passwordInput.focus();
+    };
+    app.querySelector('#generate-password').onclick = async () => { passwordInput.value = (await api('/api/system-registration/password')).password; passwordInput.dispatchEvent(new Event('input', { bubbles: true })); passwordInput.focus(); };
     const deleteSelect = app.querySelector('#delete-system');
     const removable = systemData.systems.filter(item => item.id !== 'SIS_0000');
     const integratedSystems = removable.filter(item => item.sistema_implantado === true);
