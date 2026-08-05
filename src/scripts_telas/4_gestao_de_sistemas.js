@@ -365,8 +365,9 @@ export async function systemsScreen(app) {
         renderProgress(status);
         feedback.insertAdjacentHTML('beforeend', `<section class="registration-result"><h3>Cadastro criado com sucesso</h3>${result.emailSent ? `<p class="notice">Os dados de acesso foram enviados para ${esc(result.recipients.join(', '))}.</p>` : `<p class="registration-email-warning"><strong>O e-mail não foi enviado.</strong> Informe os dados abaixo manualmente ao gestor do novo sistema.</p>`}<dl><div><dt>Sistema</dt><dd><code>${esc(credentials.system)}</code></dd></div><div><dt>Login</dt><dd><code>${esc(credentials.login)}</code></dd></div><div><dt>Senha</dt><dd><code>${esc(credentials.password)}</code></dd></div><div><dt>Link</dt><dd><code>${esc(credentials.url)}</code></dd></div></dl><button type="button" id="copy-registration-access">Copiar dados de acesso</button></section>`);
         feedback.querySelector('#copy-registration-access').onclick = async event => {
+          const button = event.currentTarget;
           await navigator.clipboard.writeText(`Sistema: ${credentials.system}\nLogin: ${credentials.login}\nSenha: ${credentials.password}\nLink: ${credentials.url}`);
-          event.currentTarget.textContent = 'Dados copiados';
+          button.textContent = 'Dados copiados';
         };
         if (!integrationSelect.querySelector(`option[value="${CSS.escape(result.system)}"]`)) {
           integrationSelect.insertAdjacentHTML('beforeend', `<option value="${esc(result.system)}">${esc(result.system)} — ${esc(values.name || result.system)}</option>`);
