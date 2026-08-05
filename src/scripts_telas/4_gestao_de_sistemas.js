@@ -1,4 +1,4 @@
-import { api, state, shell, bindShell, API_URL, SYSTEM_NAME, SYSTEM_EMAIL, SYSTEM_URL } from '../main.js';
+import { api, state, shell, bindShell, API_URL, SYSTEM_EMAIL, SYSTEM_URL } from '../main.js';
 import '../systems.css';
 import '../integration-key-preview.css';
 import { bindDocumentValidation } from '../document-validation.js';
@@ -19,8 +19,8 @@ export async function systemsScreen(app) {
   app.innerHTML = shell(`<div class="panel"><div id="registration-status">Verificando configuração...</div><form id="system-registration" class="system-form" hidden>
     <fieldset id="system-fields" disabled>
       <h2 class="form-section-title">Dados do sistema</h2><section class="form-section">
-      <div class="system-left-column"><div class="system-fields"><label>Sistema<input name="systemName" value="${esc(SYSTEM_NAME)}" readonly></label><input name="systemEmail" type="hidden" value="${esc(SYSTEM_EMAIL)}"><input name="systemUrl" type="hidden" value="${esc(SYSTEM_URL)}"><label>ID da Sistema<input name="system" readonly></label></div>
-      <div class="system-main-fields"><label>Nome da Sistema*<input name="name" required maxlength="120"></label>
+      <div class="system-left-column"><div class="system-fields"><input name="systemEmail" type="hidden" value="${esc(SYSTEM_EMAIL)}"><input name="systemUrl" type="hidden" value="${esc(SYSTEM_URL)}"><label>ID do Sistema<input name="system" readonly></label></div>
+      <div class="system-main-fields"><label>Nome do Sistema*<input name="name" required maxlength="120" autocapitalize="characters"></label>
         <div class="phone-field"><label>Telefone*<input name="phone" required inputmode="tel"></label><label class="inline-check"><input type="checkbox" name="whatsapp"> Whatsapp</label></div>
       </div></div><div class="document-group">
         <div class="document-type-field"><span>Tipo de documento*</span><div class="document-type-selector" role="radiogroup" aria-label="Tipo de documento"><label><input type="radio" name="documentType" value="CPF" required><span>CPF</span></label><label><input type="radio" name="documentType" value="CNPJ" required checked><span>CNPJ</span></label></div></div>
@@ -28,8 +28,8 @@ export async function systemsScreen(app) {
         <label id="corporate-name-field">Razão social*<input name="corporateName" maxlength="160" required></label>
       </div></section>
       <h2 class="form-section-title">Dados do administrador</h2><section class="form-section">
-      <label>Nome do Administrador*<input name="administratorName" required maxlength="120"></label><label>CPF*<input name="administratorCpf" required inputmode="numeric"></label>
-      <label>Cargo*<input name="administratorRole" required maxlength="100"></label><label>E-mail administrativo*<input name="adminEmail" type="email" required></label>
+      <label>Nome do Administrador*<input name="administratorName" required maxlength="120" autocapitalize="characters"></label><label>CPF*<input name="administratorCpf" required inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="Somente 11 números"></label>
+      <label>Cargo*<input name="administratorRole" required maxlength="100" autocapitalize="characters"></label><label>E-mail administrativo*<input name="adminEmail" type="email" required></label>
       <details><summary>Outros destinatários de e-mail</summary>
         <label>E-mail de acessos<input name="accessEmail" type="email"></label><label>E-mail financeiro<input name="financialEmail" type="email"></label><label>E-mail de comunicados<input name="communicationsEmail" type="email"></label>
       </details>
@@ -245,13 +245,24 @@ export async function systemsScreen(app) {
     const synchronizeDocumentType = () => {
       const isCnpj = form.documentType.value === 'CNPJ';
       app.querySelector('#system-document-label').textContent = `${isCnpj ? 'CNPJ' : 'CPF'}*`;
-      form.cpfCnpj.placeholder = isCnpj ? '00.000.000/0000-00' : '000.000.000-00';
+      form.cpfCnpj.placeholder = isCnpj ? 'Somente 14 números' : 'Somente 11 números';
+      form.cpfCnpj.maxLength = isCnpj ? 14 : 11;
+      form.cpfCnpj.value = form.cpfCnpj.value.replace(/\D/g, '').slice(0, isCnpj ? 14 : 11);
       form.corporateName.required = isCnpj;
       form.corporateName.disabled = !isCnpj;
       app.querySelector('#corporate-name-field').classList.toggle('is-invisible', !isCnpj);
       if (!isCnpj) form.corporateName.value = '';
       validateSystemDocument();
     };
+    const uppercaseFields = [form.name, form.administratorName, form.administratorRole];
+    uppercaseFields.forEach(input => { input.oninput = () => { input.value = input.value.toLocaleUpperCase('pt-BR'); }; });
+    form.cpfCnpj.addEventListener('input', () => {
+      const maximum = form.documentType.value === 'CNPJ' ? 14 : 11;
+      form.cpfCnpj.value = form.cpfCnpj.value.replace(/\D/g, '').slice(0, maximum);
+    });
+    form.administratorCpf.addEventListener('input', () => {
+      form.administratorCpf.value = form.administratorCpf.value.replace(/\D/g, '').slice(0, 11);
+    });
     const validateSystemDocument = bindDocumentValidation(form.cpfCnpj, () => form.documentType.value);
     bindDocumentValidation(form.administratorCpf, () => 'CPF');
     form.querySelectorAll('input[name="documentType"]').forEach(input => { input.onchange = synchronizeDocumentType; });
