@@ -7,6 +7,12 @@ const esc = value => {
   return element.innerHTML;
 };
 
+const accessProfiles = manual => Array.isArray(manual?.accessProfiles) ? manual.accessProfiles : [];
+const accessBadge = manual => {
+  const profiles = accessProfiles(manual);
+  return profiles.length ? `<em>Acesso: ${profiles.map(esc).join(' · ')}</em>` : '';
+};
+
 const externalManuals = [{
   title: 'Guia Público de Implantação da API GateGuard',
   version: '1.0',
@@ -23,7 +29,7 @@ function manualHtml(manual) {
   const sections = manual.sections.map(section => `<section id="manual-${esc(section.id)}" class="manual-section"><h2>${esc(section.title)}</h2>${section.html}</section>`).join('');
   const changes = manual.changes.map(change => `<tr><td>v${esc(change.version)}</td><td>${esc(change.date)}</td><td>${esc(change.description)}</td></tr>`).join('');
   return `<article class="manual-document">
-    <header class="manual-cover"><div class="manual-cover-art" aria-hidden="true"><i></i><i></i><i></i></div><div class="manual-brand"><img src="${esc(PUBLIC_IMAGES_URL)}/gateguard_logo.png" alt="GateGuard"><span>Acesso: ${manual.accessProfiles.map(esc).join(' · ')}</span></div><div class="manual-cover-copy"><small>GATEGUARD · ${esc(manual.code)}</small><h1>${esc(manual.title)}</h1><p>${esc(manual.subtitle)}</p></div><div class="manual-cover-version"><b>${esc(manual.code)} · Versão ${esc(manual.version)}</b><span>Atualizado em ${esc(manual.updatedAt)}</span><span>${esc(manual.status)}</span></div></header>
+    <header class="manual-cover"><div class="manual-cover-art" aria-hidden="true"><i></i><i></i><i></i></div><div class="manual-brand"><img src="${esc(PUBLIC_IMAGES_URL)}/gateguard_logo.png" alt="GateGuard">${accessProfiles(manual).length ? `<span>Acesso: ${accessProfiles(manual).map(esc).join(' · ')}</span>` : ''}</div><div class="manual-cover-copy"><small>GATEGUARD · ${esc(manual.code)}</small><h1>${esc(manual.title)}</h1><p>${esc(manual.subtitle)}</p></div><div class="manual-cover-version"><b>${esc(manual.code)} · Versão ${esc(manual.version)}</b><span>Atualizado em ${esc(manual.updatedAt)}</span><span>${esc(manual.status)}</span></div></header>
     <div class="manual-running-head"><img src="${esc(PUBLIC_IMAGES_URL)}/gateguard_logo.png" alt=""><span>${esc(manual.title)}</span><b>v${esc(manual.version)}</b></div>
     <section class="manual-meta"><div><small>Status</small><strong>${esc(manual.status)}</strong></div><div><small>Público interno</small><strong>${esc(manual.audience)}</strong></div></section>
     <section class="manual-toc"><h2>Sumário</h2><ol>${toc}<li><a href="#manual-history">Histórico de versões</a></li></ol></section>
@@ -47,7 +53,7 @@ export async function manualsScreen(app) {
   try {
     const { manuals } = await api('/api/internal-manuals');
     const list = app.querySelector('#internal-manual-list');
-    list.innerHTML = manuals.map(manual => `<button type="button" class="manual-card internal-manual" data-manual="${esc(manual.slug)}"><span>${esc(manual.code)}</span><em>Acesso: ${manual.accessProfiles.map(esc).join(' · ')}</em><h3>${esc(manual.title)}</h3><p>${esc(manual.summary)}</p><footer><b>v${esc(manual.version)}</b><i>${manual.sectionCount} seções →</i></footer></button>`).join('');
+    list.innerHTML = manuals.map(manual => `<button type="button" class="manual-card internal-manual" data-manual="${esc(manual.slug)}"><span>${esc(manual.code)}</span>${accessBadge(manual)}<h3>${esc(manual.title)}</h3><p>${esc(manual.summary)}</p><footer><b>v${esc(manual.version)}</b><i>${manual.sectionCount} seções →</i></footer></button>`).join('');
     list.querySelectorAll('[data-manual]').forEach(button => {
       button.onclick = async () => {
         button.disabled = true;
