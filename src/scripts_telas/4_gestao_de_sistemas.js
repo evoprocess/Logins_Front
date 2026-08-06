@@ -40,7 +40,7 @@ export async function systemsScreen(app) {
   <section class="form-section developer-internal-manual">
     <details>
       <summary><strong>Orientações rápidas do cadastro de sistemas · SIS_0000</strong></summary>
-      <p>Este resumo operacional é exclusivo da <code>SIS_0000</code>. Os documentos normativos, versões e registros de mudanças ficam no menu <strong>Manuais Internos</strong>.</p>
+      <p>Este resumo operacional é exclusivo da <code>SIS_0000</code>. Os documentos normativos, versões e registros de mudanças ficam no menu <strong>Manuais do Sistema</strong>.</p>
       <ol>
         <li>O sistema calcula o próximo identificador no formato <code>SIS_XXXX</code>, preservando uma numeração exclusiva de quatro algarismos.</li>
         <li>O Firebase do sistema deve estar configurado no Render do backend Gate Guard, serviço <code>Logins_Back</code>, pela variável <code>DADOS_FIREBASE_SIS_XXXX</code>.</li>

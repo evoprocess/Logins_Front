@@ -7,7 +7,7 @@ const esc = value => {
   return element.innerHTML;
 };
 
-const publicManuals = [{
+const externalManuals = [{
   title: 'Guia Público de Implantação da API GateGuard',
   version: '1.0',
   summary: 'Material entregue aos desenvolvedores dos sistemas para integração backend-to-backend.',
@@ -36,13 +36,13 @@ function manualHtml(manual) {
 export async function manualsScreen(app) {
   if (!assertOwner()) return;
   app.innerHTML = shell(`<div class="manuals-workspace">
-    <section id="manual-catalog"><div class="manuals-intro"><div><span>BASE DE CONHECIMENTO</span><h2>Manuais Internos</h2><p>Fonte de verdade para decisões de produto, segurança, implantação e operação.</p><div class="manual-legend"><b class="is-internal">INTERNO · somente SIS_0000/admin</b><b class="is-public">PÚBLICO · pode ser compartilhado</b></div></div><div class="manuals-rule"><b>Regra de visibilidade</b><p>Este ambiente inclui documentos internos e referências públicas. A área pública nunca exibe documentos internos.</p></div></div><h2 class="manual-group-title internal-title">Documentos internos protegidos</h2><div id="internal-manual-list" class="manual-grid"><p>Carregando manuais...</p></div><h2 class="manual-group-title public-title">Manuais públicos disponíveis para consulta interna</h2><div id="public-manual-list" class="manual-grid"></div></section>
+    <section id="manual-catalog"><div class="manuals-intro"><div><span>BASE DE CONHECIMENTO</span><h2>Manuais do Sistema</h2><p>Documentação interna do GateGuard e materiais externos destinados aos sistemas integrados.</p><div class="manual-legend"><b class="is-internal">INTERNO · acesso protegido</b><b class="is-public">EXTERNO · pode ser compartilhado</b></div></div><div class="manuals-rule"><b>Separação de conteúdo</b><p>Manuais internos orientam administração e operação. Manuais externos podem ser entregues a gestores e desenvolvedores dos sistemas integrados.</p></div></div><h2 class="manual-group-title internal-title">Manuais internos</h2><div id="internal-manual-list" class="manual-grid"><p>Carregando manuais...</p></div><h2 class="manual-group-title public-title">Manuais externos</h2><div id="external-manual-list" class="manual-grid"></div></section>
     <section id="manual-viewer" hidden><div class="manual-toolbar"><button type="button" id="manual-back">← Todos os manuais</button><div><button type="button" id="manual-print">Imprimir</button><button type="button" id="manual-download">Baixar PDF oficial</button></div></div><div id="manual-content"></div></section>
-  </div>`, 'Manuais Internos');
+  </div>`, 'Manuais do Sistema');
   bindShell();
 
-  const publicList = app.querySelector('#public-manual-list');
-  publicList.innerHTML = publicManuals.map(manual => `<a class="manual-card public-manual" href="${esc(manual.url)}" target="_blank" rel="noopener"><span>MANUAL PÚBLICO</span><h3>${esc(manual.title)}</h3><p>${esc(manual.summary)}</p><footer><b>v${esc(manual.version)}</b><i>Abrir PDF ↗</i></footer></a>`).join('');
+  const externalList = app.querySelector('#external-manual-list');
+  externalList.innerHTML = externalManuals.map(manual => `<a class="manual-card public-manual" href="${esc(manual.url)}" target="_blank" rel="noopener"><span>MANUAL EXTERNO</span><h3>${esc(manual.title)}</h3><p>${esc(manual.summary)}</p><footer><b>v${esc(manual.version)}</b><i>Abrir PDF ↗</i></footer></a>`).join('');
 
   try {
     const { manuals } = await api('/api/internal-manuals');
